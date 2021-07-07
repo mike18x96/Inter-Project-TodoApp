@@ -1,11 +1,15 @@
 package com.inetum.training.todo.persistance;
 
+
+import com.inetum.training.todo.controller.dto.TodoSearchParamsDto;
 import com.inetum.training.todo.domain.Todo;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TodoRepository {
 
@@ -35,10 +39,27 @@ public class TodoRepository {
     }
 
     public static Long insert(Todo todo){
-        lastId++;
+        while(todoMap.containsKey(lastId)) {
+            lastId++;
+        }
         todo.setId(lastId);
         todoMap.put(lastId, todo);
         return lastId;
+    }
+
+    public static List<Todo> find(TodoSearchParamsDto searchParams){
+        Stream<Todo> todoStream = todoMap.values().stream();
+        if(stringNotEmpty(searchParams.getName())){
+            todoStream = todoStream.filter( value -> searchParams.getName().equals(value.getName()));
+        }
+        if(stringNotEmpty(searchParams.getPriority())){
+            todoStream = todoStream.filter( value -> searchParams.getPriority().equals(value.getPriority()));
+        }
+        return todoStream.collect(Collectors.toList());
+    }
+
+    private static boolean stringNotEmpty(String str) {
+        return str != null && str.length()>0;
     }
 
 }
