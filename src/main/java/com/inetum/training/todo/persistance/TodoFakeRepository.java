@@ -1,6 +1,5 @@
 package com.inetum.training.todo.persistance;
 
-
 import com.inetum.training.todo.controller.dto.TodoSearchParamsDto;
 import com.inetum.training.todo.domain.Todo;
 
@@ -11,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TodoRepository {
+public class TodoFakeRepository {
 
     private static Map<Long, Todo> todoMap = new ConcurrentHashMap<>();
     private static Long lastId = 0L;
