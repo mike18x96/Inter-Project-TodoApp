@@ -59,9 +59,4 @@ public class TodoRestController {
         return "nie znaleziono elementu o podanym id";
     }
 
-//    private List<Todo> iterable2list(Iterable<Todo> todos) {
-//        List<Todo> result = new ArrayList<>();
-//        todos.forEach( t -> result.add(t));
-//        return result;
-//    }
 }

@@ -3,7 +3,8 @@ package com.inetum.training.todo.service;
 import com.inetum.training.todo.controller.dto.TodoSearchParamsDto;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
-import org.junit.jupiter.api.Assertions;
+//import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,11 +36,14 @@ public class SearchTodoServiceTest {
         //when
         List<Todo> todos = searchService.find(searchParams);
         //then
-        Assertions.assertEquals(1, todos.size());
-        Assertions.assertEquals(todo, todos.get(0));
+//        Assertions.assertEquals(1, todos.size());
+//        Assertions.assertEquals(todo, todos.get(0));
+        Assertions.assertThat(todos).hasSize(1);
+        Assertions.assertThat(todos).contains(todo);
+        Assertions.assertThat(todos.get(0)).isEqualTo(todo);  //poprzednia linia w innej opcji
         Mockito.verify(fakeRepository, Mockito.times(1))
                 .findBySearchParams( Mockito.anyString(), Mockito.any());
-//        Mockito.verifyNoMoreInteractions(fakeRepository);
+        Mockito.verifyNoMoreInteractions(fakeRepository);
     }
 
 
