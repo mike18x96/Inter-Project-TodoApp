@@ -1,4 +1,4 @@
-package com.inetum.training.todo;
+package com.inetum.training;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;

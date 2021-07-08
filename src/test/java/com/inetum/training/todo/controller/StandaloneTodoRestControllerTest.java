@@ -1,6 +1,6 @@
 package com.inetum.training.todo.controller;
 
-import com.inetum.training.todo.TestJsonUtils;
+import com.inetum.training.TestJsonUtils;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
 import com.inetum.training.todo.domain.Todo;
 import org.hamcrest.Matchers;
