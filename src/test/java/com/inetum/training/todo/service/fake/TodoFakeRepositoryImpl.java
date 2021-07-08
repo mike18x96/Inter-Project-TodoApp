@@ -1,4 +1,4 @@
-package com.inetum.training.service.fake;
+package com.inetum.training.todo.service.fake;
 
 
 import com.inetum.training.todo.domain.Todo;
@@ -58,7 +58,7 @@ public class TodoFakeRepositoryImpl implements TodoJpaRepository {
 
     @Override
     public Iterable<Todo> findAll() {
-        return null;
+        return todoMap.values();
     }
 
     @Override

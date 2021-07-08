@@ -1,13 +1,15 @@
 package com.inetum.training.todo.controller;
 
+import com.google.common.collect.Lists;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -20,12 +22,12 @@ public class TodoRestController {
     @RequestMapping(method = RequestMethod.GET)
     public List<Todo> getAll(){
         Iterable<Todo> todos = todoRepository.findAll();
-        return iterable2list(todos);
+        return Lists.newArrayList(todos);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Long create(@RequestBody Todo todo){
+    public Long create(@RequestBody @Valid Todo todo){
         todo.setId(null);
         return todoRepository.save(todo).getId();
     }
@@ -36,7 +38,7 @@ public class TodoRestController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public void update(@RequestBody Todo todo, @PathVariable("id") Long id){
+    public void update(@RequestBody @Valid Todo todo, @PathVariable("id") Long id){
         todo.setId(id);
         todoRepository.save(todo);
     }
@@ -44,7 +46,11 @@ public class TodoRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id){
-        todoRepository.deleteById(id);
+        try {
+            todoRepository.deleteById(id);
+        }catch(EmptyResultDataAccessException ex){
+            throw new EntityNotFoundException();
+        }
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -53,9 +59,9 @@ public class TodoRestController {
         return "nie znaleziono elementu o podanym id";
     }
 
-    private List<Todo> iterable2list(Iterable<Todo> todos) {
-        List<Todo> result = new ArrayList<>();
-        todos.forEach( t -> result.add(t));
-        return result;
-    }
+//    private List<Todo> iterable2list(Iterable<Todo> todos) {
+//        List<Todo> result = new ArrayList<>();
+//        todos.forEach( t -> result.add(t));
+//        return result;
+//    }
 }
