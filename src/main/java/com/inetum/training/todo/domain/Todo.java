@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.EqualsAndHashCode;
+import lombok.Builder;
 
 
 import javax.persistence.Entity;
@@ -19,6 +20,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@Builder
 @Entity
 @Table(name = "TODOS")
 public class Todo implements Serializable{
