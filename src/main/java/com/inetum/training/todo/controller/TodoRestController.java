@@ -5,6 +5,8 @@ import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +22,8 @@ public class TodoRestController {
     private final TodoJpaRepository todoRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Todo> getAll(){
-        Iterable<Todo> todos = todoRepository.findAll();
-        return Lists.newArrayList(todos);
+    public Page<Todo> getAll(Pageable pageRequest){
+        return todoRepository.findAll(pageRequest);
     }
 
     @RequestMapping(method = RequestMethod.POST)

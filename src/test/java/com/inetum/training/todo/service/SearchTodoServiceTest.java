@@ -11,13 +11,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static com.google.common.collect.Lists.newArrayList;
-
-import java.util.List;
+import static java.util.Collections.emptyList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchTodoServiceTest {
+    private static final int PAGE_NR = 0;
+    private static final int PAGE_SIZE = 2;
+    private static final String TODO_NAME = "nazwa";
 
     @Mock
     private TodoJpaRepository fakeRepository;
@@ -29,22 +40,35 @@ public class SearchTodoServiceTest {
     @Test
     public void find_searchByNameOnly_returnsElementFoundInRepo(){
         //given
-        Todo todo = new Todo(1L, "nazwa", "priorytet", "opis", true);
-        TodoSearchParamsDto searchParams = new TodoSearchParamsDto("nazwa", null);
-        Mockito.when( fakeRepository.findBySearchParams( Mockito.eq("nazwa"), Mockito.eq(null)))
-                .thenReturn(newArrayList(todo));
+        Todo todo = new Todo(1L, TODO_NAME, "priorytet", "opis", true);
+        TodoSearchParamsDto searchParams = new TodoSearchParamsDto(TODO_NAME, null, null);
+        when( fakeRepository.findBySearchParams( Mockito.eq("nazwa"), any(), any()))
+                .thenReturn(new PageImpl<>(newArrayList(todo)));
         //when
-        List<Todo> todos = searchService.find(searchParams);
+        Page<Todo> todos = searchService.find(searchParams);
         //then
-//        Assertions.assertEquals(1, todos.size());
-//        Assertions.assertEquals(todo, todos.get(0));
-        Assertions.assertThat(todos).hasSize(1);
-        Assertions.assertThat(todos).contains(todo);
-        Assertions.assertThat(todos.get(0)).isEqualTo(todo);  //poprzednia linia w innej opcji
-        Mockito.verify(fakeRepository, Mockito.times(1))
-                .findBySearchParams( Mockito.anyString(), Mockito.any());
-        Mockito.verifyNoMoreInteractions(fakeRepository);
+        Assertions.assertThat(todos.getTotalElements()).isEqualTo(1);
+        Assertions.assertThat(todos.getContent()).contains(todo);
+        verify(fakeRepository, times(1))
+                .findBySearchParams( anyString(),any() ,any());
+        verifyNoMoreInteractions(fakeRepository);
     }
+
+    @Test
+    public void find_searchByNameOnly_usesPageableFromSearchParam(){
+        //given
+        Pageable pageRequest = PageRequest.of(PAGE_NR, PAGE_SIZE);
+        TodoSearchParamsDto searchParams = new TodoSearchParamsDto(TODO_NAME, null, pageRequest);
+        when( fakeRepository.findBySearchParams( any(), any(), any()))
+                .thenReturn(new PageImpl<>(emptyList()));
+        //when
+        searchService.find(searchParams);
+        //then
+        verify(fakeRepository, times(1))
+                .findBySearchParams( eq("nazwa"), eq(null), eq(pageRequest));
+        verifyNoMoreInteractions(fakeRepository);
+    }
+
 
 
 }
