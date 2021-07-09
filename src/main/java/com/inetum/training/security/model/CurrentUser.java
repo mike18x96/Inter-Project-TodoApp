@@ -1,12 +1,16 @@
 package com.inetum.training.security.model;
 
-import com.inetum.training.user.domain.User;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Klasa odpowiedzialna za reprezentacje uzytkownika w kontekscie bezpieczenstwa
@@ -15,8 +19,9 @@ import java.util.Collection;
 @Builder
 @ToString
 @RequiredArgsConstructor
-public class CurrentUser implements UserDetails
-{
+public class CurrentUser implements UserDetails {
+
+    private static final long serialVersionUID = 6608807423798767487L;
 
     @NonNull
     private String login;
@@ -29,7 +34,8 @@ public class CurrentUser implements UserDetails
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return AuthorityUtils.createAuthorityList(role);
+        List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(role);
+        return authorityList;
     }
 
     @Override

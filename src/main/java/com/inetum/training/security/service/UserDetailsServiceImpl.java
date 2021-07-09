@@ -1,7 +1,6 @@
 package com.inetum.training.security.service;
 
 import com.inetum.training.security.model.CurrentUser;
-import com.inetum.training.user.domain.User;
 import com.inetum.training.user.persistance.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,24 +12,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+    private static final String ROLE_PREFIX = "ROLE_";
+
     private final UserRepository userRepository;
-    private CurrentUser currentUser;
-    private User user;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        if (userRepository.findById(username) == null) {
-            throw new UsernameNotFoundException("No found user with login: " + username);
-        } else {
-            user = userRepository.findById(username).get();
-            currentUser = CurrentUser.builder()
-                    .login(user.getLogin())
-                    .passwordHash(user.getPasswordHash())
-                    .role("ROLE_" + user.getRole())
-                    .build();
-        }
-        return currentUser;
+        return userRepository.findById(username)
+                .map(user -> CurrentUser.builder()
+                        .login(user.getLogin())
+                        .passwordHash(user.getPasswordHash())
+                        .role(ROLE_PREFIX + user.getRole().name())
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 }
-
