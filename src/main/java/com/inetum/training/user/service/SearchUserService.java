@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class SearchUserService {
 
-    private final UserRepository userRepository;
-
-    public Page<UserDto> findAllWithoutPassword(Pageable pageable) {
-        Page<User> pageOfUser = userRepository.findAll(pageable);
-        return pageOfUser.map(user -> new UserDto(user));
-    }
+//    private final UserRepository userRepository;
+//
+//    public Page<UserDto> findAllWithoutPassword(Pageable pageable) {
+//        Page<User> pageOfUser = userRepository.findAll(pageable);
+//        return pageOfUser.map(user -> new UserDto(user));
+//    }
 
 }

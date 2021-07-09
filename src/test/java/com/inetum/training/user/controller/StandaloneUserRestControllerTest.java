@@ -3,12 +3,14 @@ package com.inetum.training.user.controller;
 
 import com.inetum.training.user.controller.dto.UserDto;
 import com.inetum.training.user.domain.User;
+import com.inetum.training.user.persistance.UserRepository;
 import com.inetum.training.user.service.SearchUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +20,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.inetum.training.user.domain.User.Role.ADMIN;
 import static com.inetum.training.user.domain.User.Role.USER;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,7 +40,7 @@ public class StandaloneUserRestControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private SearchUserService userService;
+    private UserRepository userRepository;
 
     private static final String URL = "/users";
     private static final User user_1 = new User("user1", "password1", USER);
@@ -51,7 +55,7 @@ public class StandaloneUserRestControllerTest {
 
     @BeforeEach
     public void setUp(){
-        mockMvc = standaloneSetup(new UserRestController(userService))
+        mockMvc = standaloneSetup(new UserRestController(userRepository))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
     }
@@ -59,31 +63,32 @@ public class StandaloneUserRestControllerTest {
     @Test
     public void getAll_UsersFound_returnsAllUsers() throws Exception {
         //given
-        Pageable pageable = PageRequest.of(0, 2);
-        PageImpl<UserDto> pageImp = new PageImpl<>(listUserDto, pageable, listUser.size());
-        when(userService.findAllWithoutPassword(any(Pageable.class))).thenReturn(pageImp);
+        when(userRepository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(newArrayList(listUser)));
+
         //when
         mockMvc.perform(get(URL))
                 .andDo(print())
         //then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(3)))
+                .andExpect(jsonPath("$.content[0].login", is("user1")))
+                .andExpect(jsonPath("$.content[1].login", is("user2")))
                 .andExpect(jsonPath("$.totalElements").value(3))
-                .andExpect(jsonPath("$.totalPages").value(2)).andReturn();
+                .andExpect(jsonPath("$.totalPages").value(1)).andReturn();
     }
 
-//    @Test
-//    public void getAll_UserFound_returnsUserDtoWithoutPassword() throws Exception {
-//        //given
-//        User user = User.builder().login("user1").passwordHash("pass1").role(User.Role.USER).build();
-//        when(userService.findAll()).thenReturn(newArrayList(user));
-//        //when
-//        mockMvc.perform(get(URL))
-//        //then
-//                .andExpect(jsonPath("$", hasSize(1)))
-//                .andExpect(jsonPath("$[0].login", is("user1")))
-//                .andExpect(jsonPath("$[0].role", is("USER")))
-//                .andExpect(jsonPath("$[0].passwordHash").doesNotExist());
-//    }
+    @Test
+    public void getAll_UserFound_returnsUserDtoWithoutPassword() throws Exception {
+        //given
+        when(userRepository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(newArrayList(listUser)));        //when
+        mockMvc.perform(get(URL))
+        //then
+                .andExpect(jsonPath("$.content", hasSize(3)))
+                .andExpect(jsonPath("$.content[0].login", is("user1")))
+                .andExpect(jsonPath("$.content[0].role", is("USER")))
+                .andExpect(jsonPath("$.content[0].passwordHash").doesNotExist());
+    }
 
 }
