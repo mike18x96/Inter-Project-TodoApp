@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -81,7 +82,6 @@ public class StandaloneTodoRestControllerTest {
                 //then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
-
     }
 
     @Test
@@ -138,6 +138,7 @@ public class StandaloneTodoRestControllerTest {
                 .andDo(print())
                 //then
                 .andExpect(status().is4xxClientError());
+
     }
 
     @Test
