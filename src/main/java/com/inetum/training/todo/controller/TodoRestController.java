@@ -39,16 +39,20 @@ public class TodoRestController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public void update(@RequestBody @Valid Todo todo, @PathVariable("id") Long id){
-        todo.setId(id);
-        todoRepository.save(todo);
+        if(todoRepository.existsById(id)){
+            todo.setId(id);
+            todoRepository.save(todo);
+        }else{
+            throw new EntityNotFoundException();
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id){
-        try {
+        if(todoRepository.existsById(id)){
             todoRepository.deleteById(id);
-        }catch(EmptyResultDataAccessException ex){
+        }else{
             throw new EntityNotFoundException();
         }
     }
