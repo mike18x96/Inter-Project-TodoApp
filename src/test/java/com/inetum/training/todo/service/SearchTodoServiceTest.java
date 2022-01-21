@@ -18,6 +18,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -41,15 +43,15 @@ public class SearchTodoServiceTest {
         //given
         Todo todo = new Todo(1L, "nazwa", "priorytet", "opis", true);
         TodoSearchParamsDto searchParams = new TodoSearchParamsDto("nazwa", null);
-        Mockito.when(fakeRepository.findBySearchParams(Mockito.eq("nazwa"), Mockito.eq(null)))
+        when(fakeRepository.findBySearchParams(eq("nazwa"), eq(null)))
                 .thenReturn(newArrayList(todo));
         //when
         List<Todo> todos = searchService.find(searchParams);
         //then
         Assertions.assertEquals(1, todos.size());
         Assertions.assertEquals(todo, todos.get(0));
-        Mockito.verify(fakeRepository, Mockito.times(1))
-                .findBySearchParams(Mockito.anyString(), Mockito.any());
+        verify(fakeRepository, times(1))
+                .findBySearchParams(anyString(), any());
     }
 
     @Test
@@ -57,15 +59,15 @@ public class SearchTodoServiceTest {
         //given
         Todo todo = new Todo(1L, "nazwa", "priorytet", "opis", true);
         TodoSearchParamsDto searchParams = new TodoSearchParamsDto(null, "priorytet");
-        Mockito.when(fakeRepository.findBySearchParams(Mockito.eq(null), Mockito.eq("priorytet")))
+        when(fakeRepository.findBySearchParams(eq(null), eq("priorytet")))
                 .thenReturn(newArrayList(todo));
         //when
         List<Todo> todos = searchService.find(searchParams);
         //then
         Assertions.assertEquals(1, todos.size());
         Assertions.assertEquals(todo, todos.get(0));
-        Mockito.verify(fakeRepository, Mockito.times(1))
-                .findBySearchParams(Mockito.isNull(), Mockito.eq("priorytet"));
+        verify(fakeRepository, times(1))
+                .findBySearchParams(isNull(), eq("priorytet"));
     }
 
     private static Stream<Arguments> generateDataBothParameters() {
@@ -79,16 +81,16 @@ public class SearchTodoServiceTest {
     public void find_searchByBothParameters_returnsElementFoundInRepo(String findName, String findPriority, int sizeList, List<Todo> expectedTodo) {
         //given
         TodoSearchParamsDto searchParams = new TodoSearchParamsDto(findName, findPriority);
-        Mockito.when(fakeRepository.findBySearchParams(Mockito.eq(findName), Mockito.eq(findPriority)))
-                .thenReturn(newArrayList(expectedTodo));
+        when(fakeRepository.findBySearchParams(eq(findName), eq(findPriority)))
+                .thenReturn(expectedTodo);
 
         //when
         List<Todo> todos = searchService.find(searchParams);
         //then
         Assertions.assertEquals(sizeList, todos.size());
         Assertions.assertEquals(expectedTodo, todos);
-        Mockito.verify(fakeRepository, Mockito.times(1))
-                .findBySearchParams(Mockito.eq("nazwa"), Mockito.eq("priorytet"));
+        verify(fakeRepository, times(1))
+                .findBySearchParams(eq("nazwa"), eq("priorytet"));
     }
 
     private static Stream<Arguments> generateDataNotExistingParameters() {
@@ -104,16 +106,16 @@ public class SearchTodoServiceTest {
     public void find_searchByNotExistingParameters_returnsNoElement(String findName, String findPriority, int sizeList, List<Todo> expectedTodo) {
         //given
         TodoSearchParamsDto searchParams = new TodoSearchParamsDto(findName, findPriority);
-        Mockito.when(fakeRepository.findBySearchParams(Mockito.eq(findName), Mockito.eq(findPriority)))
-                .thenReturn(newArrayList(expectedTodo));
+        when(fakeRepository.findBySearchParams(eq(findName), eq(findPriority)))
+                .thenReturn(expectedTodo);
 
         //when
         List<Todo> todos = searchService.find(searchParams);
         //then
         Assertions.assertEquals(sizeList, todos.size());
         Assertions.assertEquals(expectedTodo, todos);
-        Mockito.verify(fakeRepository, Mockito.times(1))
-                .findBySearchParams(Mockito.anyString(), Mockito.anyString());
+        verify(fakeRepository, times(1))
+                .findBySearchParams(anyString(), anyString());
     }
 
     @ParameterizedTest
@@ -123,15 +125,15 @@ public class SearchTodoServiceTest {
         //given
         Todo todo = new Todo(1L, "nazwa", "priorytet", "opis", true);
         TodoSearchParamsDto searchParams = new TodoSearchParamsDto(input, input);
-        Mockito.when(fakeRepository.findBySearchParams(Mockito.eq(input), Mockito.eq(input)))
+        when(fakeRepository.findBySearchParams(eq(input), eq(input)))
                 .thenReturn(newArrayList(todo));
         //when
         List<Todo> todos = searchService.find(searchParams);
         //then
         Assertions.assertEquals(1, todos.size());
         Assertions.assertEquals(todo, todos.get(0));
-        Mockito.verify(fakeRepository, Mockito.times(1))
-                .findBySearchParams(Mockito.any(), Mockito.any());
+        verify(fakeRepository, times(1))
+                .findBySearchParams(any(), any());
     }
 
 

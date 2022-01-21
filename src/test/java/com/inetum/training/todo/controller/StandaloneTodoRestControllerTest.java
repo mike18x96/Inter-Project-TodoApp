@@ -3,6 +3,7 @@ package com.inetum.training.todo.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.service.fake.TodoFakeRepositoryImpl;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,12 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,7 +67,7 @@ public class StandaloneTodoRestControllerTest {
         List<Todo> listTodo = Arrays.asList(todo1, todo2);
 
         when(fakeRepository.findAll())
-                .thenReturn(newArrayList(listTodo));
+                .thenReturn(listTodo);
         //when
         mockMvc.perform(get(URL)
                         .contentType(APPLICATION_JSON)
@@ -84,7 +83,7 @@ public class StandaloneTodoRestControllerTest {
     public void getOne_nothingFound_returns404() throws Exception {
         //given
         when(fakeRepository.findById(3L))
-                .thenThrow(EntityNotFoundException.class);
+                .thenReturn(Optional.empty());
         //when
         mockMvc.perform(get(URL + "/3"))
                 .andDo(print())
@@ -106,7 +105,11 @@ public class StandaloneTodoRestControllerTest {
                 .andDo(print())
                 //then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.name", Matchers.is("nazwa1")))
+                .andExpect(jsonPath("$.priority", Matchers.is("priorytet1")))
+                .andExpect(content().contentType(APPLICATION_JSON));
+        verify(fakeRepository, times(1)).findById(anyLong());
+
     }
 
     @Test
@@ -123,7 +126,7 @@ public class StandaloneTodoRestControllerTest {
                 .andDo(print())
                 //then
                 .andExpect(status().is4xxClientError());
-        verify(fakeRepository, times(0)).save(any());
+        verify(fakeRepository, never()).save(anyObject());
 
     }
 
@@ -154,7 +157,8 @@ public class StandaloneTodoRestControllerTest {
     @Test
     public void put_elementWithoutName_returns400() throws Exception {
         //given
-        String jsonTodo = "{\"priority\":\"wazny\", " +
+        String jsonTodo = "{\"id\":\"2\", " +
+                "\"priority\":\"wazny\", " +
                 "\"description\":\"opis\", " +
                 "\"completed\":\"false\"}";
         //when
@@ -165,20 +169,20 @@ public class StandaloneTodoRestControllerTest {
                 .andDo(print())
                 //then
                 .andExpect(status().is4xxClientError());
-        verify(fakeRepository, times(0)).save(any());
-        verify(fakeRepository, times(0)).existsById(any());
+        verify(fakeRepository, never()).save(any());
+        verify(fakeRepository, never()).existsById(anyLong());
 
     }
 
     @Test
     public void put_completeElementWhenTodoExists_returns2xx() throws Exception {
         //given
-        String jsonTodo = "{\"name\":\"nazwa\", " +
+        String jsonTodo = "{\"id\":\"2\", " +
+                "\"name\":\"nazwa\", " +
                 "\"priority\":\"wazny\", " +
                 "\"description\":\"opis\", " +
                 "\"completed\":\"false\"}";
         Todo todoFromJson = objectMapper.readValue(jsonTodo, Todo.class);
-        todoFromJson.setId(2L);
         when(fakeRepository.existsById(2L)).thenReturn(true);
         when(fakeRepository.save(todoFromJson)).thenReturn(todoFromJson);
         //when
@@ -189,8 +193,8 @@ public class StandaloneTodoRestControllerTest {
                 .andDo(print())
                 //then
                 .andExpect(status().is2xxSuccessful());
-        verify(fakeRepository, times(1)).save(any());
-        verify(fakeRepository, times(1)).existsById(any());
+        verify(fakeRepository, times(1)).save(todoFromJson);
+        verify(fakeRepository, times(1)).existsById(anyLong());
 
     }
 
@@ -201,7 +205,7 @@ public class StandaloneTodoRestControllerTest {
                 "\"priority\":\"wazny\", " +
                 "\"description\":\"opis\", " +
                 "\"completed\":\"false\"}";
-        when(fakeRepository.existsById(2L)).thenThrow(EntityNotFoundException.class);
+        when(fakeRepository.existsById(2L)).thenReturn(false);
         //when
         mockMvc.perform(put(URL + "/2")
                         .contentType(APPLICATION_JSON)
@@ -211,8 +215,8 @@ public class StandaloneTodoRestControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$", is("nie znaleziono elementu o podanym id")));
-        verify(fakeRepository, times(0)).save(any());
-        verify(fakeRepository, times(1)).existsById(any());
+        verify(fakeRepository, never()).save(any());
+        verify(fakeRepository, times(1)).existsById(anyLong());
     }
 
     @Test
@@ -226,8 +230,8 @@ public class StandaloneTodoRestControllerTest {
                 .andDo(print())
                 //then
                 .andExpect(status().isNoContent());
-        verify(fakeRepository, times(1)).existsById(any());
-        verify(fakeRepository, times(1)).deleteById(any());
+        verify(fakeRepository, times(1)).existsById(anyLong());
+        verify(fakeRepository, times(1)).deleteById(anyLong());
 
     }
 
@@ -243,8 +247,8 @@ public class StandaloneTodoRestControllerTest {
                 //then
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$", is("nie znaleziono elementu o podanym id")));
-        verify(fakeRepository, times(1)).existsById(any());
-        verify(fakeRepository, times(0)).deleteById(any());
+        verify(fakeRepository, times(1)).existsById(anyLong());
+        verify(fakeRepository, never()).deleteById(anyLong());
     }
 
 
