@@ -3,7 +3,9 @@ package com.inetum.training.todo.service.fake;
 
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
+import org.springframework.dao.EmptyResultDataAccessException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,25 +21,31 @@ public class TodoFakeRepositoryImpl implements TodoJpaRepository {
 
     @Override
     public Todo save(Todo todo) {
-        lastId++;
-        todo.setId(lastId);
-        todoMap.put(lastId, todo);
+
+        if(todo.getId()==null){
+            lastId= Long.valueOf(todoMap.size());
+            todo.setId(++lastId);
+            todoMap.put(lastId, todo);
+        }else{
+            todoMap.put(todo.getId(),todo);
+        }
         return todo;
     }
 
     @Override
     public List<Todo> findBySearchParams(String name, String priority) {
         Stream<Todo> todoStream = todoMap.values().stream();
-        if(stringNotEmpty(name)){
-            todoStream = todoStream.filter( value -> name.equals(value.getName()));
+        if (stringNotEmpty(name)) {
+            todoStream = todoStream.filter(value -> name.equals(value.getName()));
         }
-        if(stringNotEmpty(priority)){
-            todoStream = todoStream.filter( value -> priority.equals(value.getPriority()));
+        if (stringNotEmpty(priority)) {
+            todoStream = todoStream.filter(value -> priority.equals(value.getPriority()));
         }
         return todoStream.collect(Collectors.toList());
     }
+
     private static boolean stringNotEmpty(String str) {
-        return str != null && str.length()>0;
+        return str != null && str.length() > 0;
     }
 
 
@@ -48,12 +56,19 @@ public class TodoFakeRepositoryImpl implements TodoJpaRepository {
 
     @Override
     public Optional<Todo> findById(Long aLong) {
-        return Optional.empty();
+
+
+        return Optional.ofNullable(todoMap.get(aLong));
+
     }
 
     @Override
     public boolean existsById(Long aLong) {
-        return false;
+        if (todoMap.get(aLong) == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
@@ -73,7 +88,11 @@ public class TodoFakeRepositoryImpl implements TodoJpaRepository {
 
     @Override
     public void deleteById(Long aLong) {
-
+        if (todoMap.get(aLong) == null) {
+            throw new EntityNotFoundException();
+        }else{
+            todoMap.remove(aLong);
+        }
     }
 
 

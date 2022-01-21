@@ -15,7 +15,7 @@
     <description>Training project to learn basics of Spring, Jpa/Hibernate, Java 11, and other tools</description>
     <properties>
         <java.version>11</java.version>
-        <guava.version>30.1.1-jre</guava.version>
+        <guava.version>31.0.1-jre</guava.version>
     </properties>
     <dependencies>
         <dependency>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+<!--            <scope>test</scope>-->
         </dependency>
     </dependencies>
 
