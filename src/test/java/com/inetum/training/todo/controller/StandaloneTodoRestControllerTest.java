@@ -1,16 +1,20 @@
 package com.inetum.training.todo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.inetum.training.todo.TestJsonUtils;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.service.fake.TodoFakeRepositoryImpl;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -109,9 +113,9 @@ public class StandaloneTodoRestControllerTest {
                 .andExpect(jsonPath("$.priority", Matchers.is("priorytet1")))
                 .andExpect(content().contentType(APPLICATION_JSON));
         verify(fakeRepository, times(1)).findById(anyLong());
-
     }
 
+    @Disabled
     @Test
     public void post_elementWithoutName_returns400() throws Exception {
         //given
@@ -126,8 +130,23 @@ public class StandaloneTodoRestControllerTest {
                 .andDo(print())
                 //then
                 .andExpect(status().is4xxClientError());
-        verify(fakeRepository, never()).save(anyObject());
+        verify(fakeRepository, never()).save(any());
+    }
 
+    @Test
+    public void post_elementWithoutName_returns400_v2() throws Exception{
+        //given
+        Todo todo = Todo.builder()
+                .priority("wazny")
+                .description("opis")
+                .completed(false)
+                .build();
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.post(URL)
+                        .contentType(TestJsonUtils.APPLICATION_JSON)
+                        .content(TestJsonUtils.convertObjectToJson(todo)))
+                //then
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
     @Test
@@ -195,7 +214,6 @@ public class StandaloneTodoRestControllerTest {
                 .andExpect(status().is2xxSuccessful());
         verify(fakeRepository, times(1)).save(todoFromJson);
         verify(fakeRepository, times(1)).existsById(anyLong());
-
     }
 
     @Test
