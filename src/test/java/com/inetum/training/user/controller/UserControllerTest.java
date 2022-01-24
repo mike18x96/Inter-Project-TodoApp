@@ -1,24 +1,23 @@
 package com.inetum.training.user.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
-import com.inetum.training.todo.domain.Todo;
-import com.inetum.training.user.controller.dto.UserDtoWithoutPassword;
+import com.inetum.training.TestJsonUtils;
 import com.inetum.training.user.domain.User;
-import com.inetum.training.user.persistance.UserJpaRepository;
+import com.inetum.training.user.persistance.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.inetum.training.user.domain.User.Role.ADMIN;
 import static com.inetum.training.user.domain.User.Role.USER;
+import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
@@ -32,35 +31,26 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 public class UserControllerTest {
 
     @Mock
-    private UserJpaRepository userJpaRepository;
+    private UserRepository userRepository;
 
     private MockMvc mockMvc;
-    public static final String URL = "/user";
+    public static final String URL = "/users";
 
     @BeforeEach
     public void setUp() {
-        mockMvc = standaloneSetup(new UserRestController(userJpaRepository))
+        mockMvc = standaloneSetup(new UserRestController(userRepository))
                 .build();
     }
 
-    private static final User user1 = User.builder()
-            .login("login1")
-            .passwordHash("password1")
-            .role(USER)
-            .build();
-    private static final User user2 = User.builder()
-            .login("login2")
-            .passwordHash("password2")
-            .role(ADMIN)
-            .build();
-    private static final UserDtoWithoutPassword userDtoWithoutPassword1 = new UserDtoWithoutPassword(user1);
-    private static final UserDtoWithoutPassword userDtoWithoutPassword2 = new UserDtoWithoutPassword(user2);
-    List<UserDtoWithoutPassword> listUser = Arrays.asList(userDtoWithoutPassword1, userDtoWithoutPassword2);
+    private static final User user1 = new User("login1", "password1", USER);
+    private static final User user2 = new User("login2", "password2", ADMIN);
+
+    List<User> listUser = Arrays.asList(user1, user2);
 
     @Test
     public void getAll_UserFound_returnsUserWithoutPassword() throws Exception {
         //given
-        when(userJpaRepository.getUserWithoutPassword()).thenReturn(listUser);
+        when(userRepository.findAll()).thenReturn(listUser);
         //when
         mockMvc.perform(get(URL)
                         .contentType(APPLICATION_JSON)
@@ -70,13 +60,14 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].login").value("login1"))
-                .andExpect(jsonPath("$[1].login").value("login2"))
-                .andExpect(jsonPath("$[0].role").value("USER"))
-                .andExpect(jsonPath("$[1].role").value("ADMIN"));
-        verify(userJpaRepository, times(1)).getUserWithoutPassword();
+                .andExpect(jsonPath("$[?(@.login == 'login1')].login").value("login1"))
+                .andExpect(jsonPath("$[?(@.login == 'login2')].login").value("login2"))
+                .andExpect(jsonPath("$[?(@.role == 'USER')].role").value("USER"))
+                .andExpect(jsonPath("$[?(@.role == 'ADMIN')].role").value("ADMIN"))
+                .andExpect(jsonPath("$[0].passwordHash").doesNotExist())
+                .andExpect(jsonPath("$[1].passwordHash").doesNotExist());
+        verify(userRepository, times(1)).findAll();
 
     }
-
 
 }

@@ -1,4 +1,4 @@
-package com.inetum.training.todo;
+package com.inetum.training;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,9 +7,10 @@ import java.io.IOException;
 
 public class TestJsonUtils {
 
+    static ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+
     public static String convertObjectToJson(Object object) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+
         return mapper.writeValueAsString(object);
     }
 

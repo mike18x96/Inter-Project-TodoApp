@@ -147,7 +147,7 @@ public class SearchTodoServiceTest {
         assertThat(todos).hasSize(1);
         assertThat(todos.get(0)).isEqualTo(todo);
         verify(fakeRepository, times(1))
-                .findBySearchParams(any(), anyString());
+                .findBySearchParams(any(), any());
     }
 
 

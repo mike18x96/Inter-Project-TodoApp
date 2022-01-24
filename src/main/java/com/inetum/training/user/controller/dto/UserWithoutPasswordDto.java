@@ -8,9 +8,9 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 @Builder
-public class UserDtoWithoutPassword {
+public class UserWithoutPasswordDto {
 
-    public UserDtoWithoutPassword(User user){
+    public UserWithoutPasswordDto(User user){
         this.login = user.getLogin();
         this.role = user.getRole();
     }

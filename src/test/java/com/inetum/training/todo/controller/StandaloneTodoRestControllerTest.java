@@ -1,7 +1,7 @@
 package com.inetum.training.todo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.inetum.training.todo.TestJsonUtils;
+import com.inetum.training.TestJsonUtils;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.service.fake.TodoFakeRepositoryImpl;
 import org.hamcrest.Matchers;
@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
@@ -142,7 +141,7 @@ public class StandaloneTodoRestControllerTest {
                 .completed(false)
                 .build();
         //when
-        mockMvc.perform(MockMvcRequestBuilders.post(URL)
+        mockMvc.perform(post(URL)
                         .contentType(APPLICATION_JSON)
                         .content(TestJsonUtils.convertObjectToJson(todo)))
                 //then

@@ -1,26 +1,27 @@
 package com.inetum.training.user.controller;
 
-import com.google.common.collect.Lists;
-import com.inetum.training.user.controller.dto.UserDtoWithoutPassword;
-import com.inetum.training.user.persistance.UserJpaRepository;
+import com.inetum.training.user.controller.dto.UserWithoutPasswordDto;
+import com.inetum.training.user.persistance.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserRestController {
 
-    private final UserJpaRepository userJpaRepository;
+    private final UserRepository userRepository;
 
     @GetMapping
-    public List<UserDtoWithoutPassword> getAllWithoutPassword() {
-        Iterable<UserDtoWithoutPassword> users = userJpaRepository.getUserWithoutPassword();
-        return Lists.newArrayList(users);
+    public List<UserWithoutPasswordDto> getAll(){
+        return userRepository.findAll().stream()
+                .map(UserWithoutPasswordDto::new)
+                .collect(Collectors.toList());
     }
 
 }
