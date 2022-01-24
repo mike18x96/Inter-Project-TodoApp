@@ -143,7 +143,7 @@ public class StandaloneTodoRestControllerTest {
                 .build();
         //when
         mockMvc.perform(MockMvcRequestBuilders.post(URL)
-                        .contentType(TestJsonUtils.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content(TestJsonUtils.convertObjectToJson(todo)))
                 //then
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());

@@ -53,7 +53,6 @@ public class SearchTodoServiceTest {
         //then
         assertThat(todos).hasSize(1);
         assertThat(todos).contains(todo);
-        assertThat(todos.get(0)).isEqualTo(todo);
         verify(fakeRepository, times(1))
                 .findBySearchParams(Mockito.anyString(), Mockito.any());
         verifyNoMoreInteractions(fakeRepository);
@@ -98,7 +97,7 @@ public class SearchTodoServiceTest {
         List<Todo> todos = searchService.find(searchParams);
         //then
         assertThat(todos).hasSize(sizeList);
-        assertThat(todos).isEqualTo(expectedTodo);
+        assertThat(todos).containsAll(expectedTodo);
         verify(fakeRepository, times(1))
                 .findBySearchParams(eq("nazwa"), eq("priorytet"));
     }
@@ -122,7 +121,7 @@ public class SearchTodoServiceTest {
         List<Todo> todos = searchService.find(searchParams);
         //then
         assertThat(todos).hasSize(sizeList);
-        assertThat(todos).isEqualTo(expectedTodo);
+        assertThat(todos).containsAll(expectedTodo);
         verify(fakeRepository, times(1))
                 .findBySearchParams(anyString(), anyString());
     }
@@ -148,7 +147,7 @@ public class SearchTodoServiceTest {
         assertThat(todos).hasSize(1);
         assertThat(todos.get(0)).isEqualTo(todo);
         verify(fakeRepository, times(1))
-                .findBySearchParams(any(), any());
+                .findBySearchParams(any(), anyString());
     }
 
 
