@@ -31,7 +31,6 @@ public class User implements Serializable {
     private String login;
 
     @Length(min = 5)
-    @Getter(AccessLevel.NONE)
     private String passwordHash;
 
     @NotNull
