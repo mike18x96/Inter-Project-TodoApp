@@ -26,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             user = userRepository.findById(username).get();
             currentUser = CurrentUser.builder()
                     .login(user.getLogin())
-                    .passwordHash("{noop}" + user.getPasswordHash())
+                    .passwordHash(user.getPasswordHash())
                     .role("ROLE_" + user.getRole())
                     .build();
         }

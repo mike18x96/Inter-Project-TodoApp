@@ -30,7 +30,6 @@ public class User implements Serializable {
     @Id
     private String login;
 
-    @Length(min = 5)
     private String passwordHash;
 
     @NotNull
