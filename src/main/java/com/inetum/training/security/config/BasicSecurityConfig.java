@@ -1,4 +1,4 @@
-package com.inetum.training.securityconfig;
+package com.inetum.training.security.config;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;

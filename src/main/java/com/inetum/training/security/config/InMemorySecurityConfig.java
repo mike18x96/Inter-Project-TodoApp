@@ -1,11 +1,9 @@
-package com.inetum.training.securityconfig;
+package com.inetum.training.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 //@Configuration
 //@EnableWebSecurity
@@ -17,19 +15,14 @@ public class InMemorySecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic();
         http.authorizeRequests()
                 .antMatchers("/users").hasRole("ADMIN")
-                .antMatchers("/todos/**","/search/**").hasRole("USER");
-
-//                .antMatchers("/todos").access("hasRole('ROLE_USER')");  //w innym stylu
-
+                .antMatchers("/todos/**").access("hasRole('ROLE_USER')")   //w innym stylu
+                .antMatchers("/search/todos/**").hasRole("USER");
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        auth.inMemoryAuthentication().withUser("heniek").password(encoder.encode("heniek")).roles("USER");
-        auth.inMemoryAuthentication().withUser("admin").password(encoder.encode("admin")).roles("ADMIN","USER");
+        auth.inMemoryAuthentication().withUser("heniek").password("heniek").roles("USER");
+        auth.inMemoryAuthentication().withUser("admin").password("admin").roles("ADMIN", "USER");
     }
-
-
 
 }
