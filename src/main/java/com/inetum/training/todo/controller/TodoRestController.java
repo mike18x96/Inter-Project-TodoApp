@@ -1,6 +1,5 @@
 package com.inetum.training.todo.controller;
 
-import com.google.common.collect.Lists;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/todos")

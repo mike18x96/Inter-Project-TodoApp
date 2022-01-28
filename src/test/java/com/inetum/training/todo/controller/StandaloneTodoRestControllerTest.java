@@ -16,7 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
@@ -89,11 +88,6 @@ public class StandaloneTodoRestControllerTest {
                 .andExpect(jsonPath("$.totalElements").value(3))
                 .andExpect(jsonPath("$.totalPages").value(2)).andReturn();
 
-
-
-//                .andExpect(jsonPath("$", hasSize(2)))
-//                .andExpect(jsonPath("$[0].name", is("nazwa1")))
-//                .andExpect(jsonPath("$[1].name", is("nazwa2")));
     }
 
     @Test
@@ -128,26 +122,8 @@ public class StandaloneTodoRestControllerTest {
         verify(fakeRepository, times(1)).findById(anyLong());
     }
 
-    @Disabled
     @Test
-    public void post_elementWithoutName_returns400() throws Exception {
-        //given
-        String jsonTodo = "{\"priority\":\"wazny\", " +
-                "\"description\":\"opis\", " +
-                "\"completed\":\"false\"}";
-        //when
-        mockMvc.perform(post(URL)
-                        .contentType(APPLICATION_JSON)
-                        .content(jsonTodo)
-                        .accept(APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpect(status().is4xxClientError());
-        verify(fakeRepository, never()).save(any());
-    }
-
-    @Test
-    public void post_elementWithoutName_returns400_v2() throws Exception{
+    public void post_elementWithoutName_returns400() throws Exception{
         //given
         Todo todo = Todo.builder()
                 .priority("wazny")
@@ -157,9 +133,11 @@ public class StandaloneTodoRestControllerTest {
         //when
         mockMvc.perform(post(URL)
                         .contentType(APPLICATION_JSON)
-                        .content(TestJsonUtils.convertObjectToJson(todo)))
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
                 //then
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(status().is4xxClientError());
+        verify(fakeRepository, never()).save(any());
     }
 
     @Test

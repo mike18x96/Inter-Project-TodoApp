@@ -1,7 +1,6 @@
 package com.inetum.training.user.domain;
 
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
