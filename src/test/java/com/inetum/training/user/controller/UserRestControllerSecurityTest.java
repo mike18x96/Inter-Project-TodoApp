@@ -29,8 +29,8 @@ public class UserRestControllerSecurityTest {
     @Autowired
     private WebApplicationContext context;
 
-    @Mock
-    private UserRepository repository;
+//    @Mock
+//    private UserRepository repository;
 
     private static final String URL = "/users";
 
@@ -47,7 +47,7 @@ public class UserRestControllerSecurityTest {
     @Test
     public void getAll_noCredentials_returnsUnauthrorized401() throws Exception {
         //given
-        when(repository.findAll()).thenReturn(emptyList());
+        //when(repository.findAll()).thenReturn(emptyList());
         //when
         mockMvc.perform(get(URL).with(anonymous()))
         //then
@@ -57,7 +57,7 @@ public class UserRestControllerSecurityTest {
     @Test
     public void getAll_authorizedPlainUser_returnsForbidden403() throws Exception {
         //given
-        when(repository.findAll()).thenReturn(emptyList());
+        //when(repository.findAll()).thenReturn(emptyList());
         //when
         mockMvc.perform(get(URL).with(user("user").roles("USER")))
         //then
@@ -67,7 +67,7 @@ public class UserRestControllerSecurityTest {
     @Test
     public void getAll_authorizedAdminUser_returns200() throws Exception {
         //given
-        when(repository.findAll()).thenReturn(emptyList());
+        //when(repository.findAll()).thenReturn(emptyList());
         //when
         mockMvc.perform(get(URL).with(user("admin").roles("ADMIN")))
                 //then

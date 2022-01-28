@@ -3,7 +3,7 @@ package com.inetum.training.todo.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inetum.training.TestJsonUtils;
 import com.inetum.training.todo.domain.Todo;
-import com.inetum.training.todo.service.fake.TodoFakeRepositoryImpl;
+import com.inetum.training.todo.persistance.TodoJpaRepository;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -11,6 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -34,7 +38,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 public class StandaloneTodoRestControllerTest {
 
     @Mock
-    private TodoFakeRepositoryImpl fakeRepository;
+    private TodoJpaRepository fakeRepository;
 
     private MockMvc mockMvc;
     public static final String URL = "/todos";
@@ -45,21 +49,20 @@ public class StandaloneTodoRestControllerTest {
     @BeforeEach
     public void setUp() {
         mockMvc = standaloneSetup(new TodoRestController(fakeRepository))
+                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
     }
 
     @Test
     public void getAll_properRequest_returns200() throws Exception {
-
         //given
-        MockHttpServletRequestBuilder mockRequest = get(URL);
+
         //when
-        mockMvc.perform(mockRequest)
+        mockMvc.perform(get("/todos?page=0&size=2")
+                .contentType(APPLICATION_JSON))
                 .andDo(print())
                 //then
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON));
-        verify(fakeRepository, times(1)).findAll();
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -67,19 +70,30 @@ public class StandaloneTodoRestControllerTest {
         //given
         Todo todo1 = new Todo(1L, "nazwa1", "priorytet1", "opis1", true);
         Todo todo2 = new Todo(2L, "nazwa2", "priorytet2", "opis2", true);
-        List<Todo> listTodo = Arrays.asList(todo1, todo2);
+        Todo todo3 = new Todo(3L, "nazwa3", "priorytet3", "opis3", true);
+        List<Todo> listTodo = Arrays.asList(todo1, todo2, todo3);
 
-        when(fakeRepository.findAll())
-                .thenReturn(listTodo);
+        Pageable pageable = PageRequest.of(0, 2);
+        PageImpl<Todo> todoPage = new PageImpl<>(listTodo, pageable, listTodo.size());
+
+        when(fakeRepository.findAll(any(Pageable.class))).thenReturn(todoPage);
+
         //when
-        mockMvc.perform(get(URL)
+        mockMvc.perform(get("/todos?page=0&size=2")
                         .contentType(APPLICATION_JSON)
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 //then
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("nazwa1")))
-                .andExpect(jsonPath("$[1].name", is("nazwa2")));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(3)))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.totalPages").value(2)).andReturn();
+
+
+
+//                .andExpect(jsonPath("$", hasSize(2)))
+//                .andExpect(jsonPath("$[0].name", is("nazwa1")))
+//                .andExpect(jsonPath("$[1].name", is("nazwa2")));
     }
 
     @Test
