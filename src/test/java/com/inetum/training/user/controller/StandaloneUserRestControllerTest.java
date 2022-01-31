@@ -4,15 +4,12 @@ package com.inetum.training.user.controller;
 import com.inetum.training.user.controller.dto.UserDto;
 import com.inetum.training.user.domain.User;
 import com.inetum.training.user.persistance.UserRepository;
-import com.inetum.training.user.service.SearchUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,7 +40,7 @@ public class StandaloneUserRestControllerTest {
     private UserRepository userRepository;
 
     private static final String URL = "/users";
-    private static final User user_1 = new User("user1", "password1", USER);
+    private static final User user_1 = new User("user1", "password1", USER );
     private static final User user_2 = new User("user2", "password2", ADMIN);
     private static final User user_3 = new User("user3", "password3", ADMIN);
     private static final List<User> listUser = Arrays.asList(user_1, user_2, user_3);
@@ -64,7 +61,7 @@ public class StandaloneUserRestControllerTest {
     public void getAll_UsersFound_returnsAllUsers() throws Exception {
         //given
         when(userRepository.findAll(any(Pageable.class)))
-                .thenReturn(new PageImpl<>(newArrayList(listUser)));
+                .thenReturn(new PageImpl<>(listUser));
 
         //when
         mockMvc.perform(get(URL))
@@ -82,7 +79,7 @@ public class StandaloneUserRestControllerTest {
     public void getAll_UserFound_returnsUserDtoWithoutPassword() throws Exception {
         //given
         when(userRepository.findAll(any(Pageable.class)))
-                .thenReturn(new PageImpl<>(newArrayList(listUser)));        //when
+                .thenReturn(new PageImpl<>(listUser));        //when
         mockMvc.perform(get(URL))
         //then
                 .andExpect(jsonPath("$.content", hasSize(3)))
