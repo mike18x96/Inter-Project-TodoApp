@@ -44,6 +44,10 @@ public class StandaloneTodoRestControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private static Todo todo1 = new Todo(1L, "nazwa1", "priorytet1", "opis1", true);
+    private static Todo todo2 = new Todo(2L, "nazwa2", "priorytet2", "opis2", true);
+    private static Todo todo3 = new Todo(3L, "nazwa3", "priorytet3", "opis3", true);
+    List<Todo> listTodo = Arrays.asList(todo1, todo2, todo3);
 
     @BeforeEach
     public void setUp() {
@@ -67,16 +71,9 @@ public class StandaloneTodoRestControllerTest {
     @Test
     public void getAll_TodoFound_returnsTodo() throws Exception {
         //given
-        Todo todo1 = new Todo(1L, "nazwa1", "priorytet1", "opis1", true);
-        Todo todo2 = new Todo(2L, "nazwa2", "priorytet2", "opis2", true);
-        Todo todo3 = new Todo(3L, "nazwa3", "priorytet3", "opis3", true);
-        List<Todo> listTodo = Arrays.asList(todo1, todo2, todo3);
-
         Pageable pageable = PageRequest.of(0, 2);
         PageImpl<Todo> todoPage = new PageImpl<>(listTodo, pageable, listTodo.size());
-
         when(fakeRepository.findAll(any(Pageable.class))).thenReturn(todoPage);
-
         //when
         mockMvc.perform(get("/todos?page=0&size=2")
                         .contentType(APPLICATION_JSON)
@@ -84,9 +81,9 @@ public class StandaloneTodoRestControllerTest {
                 .andDo(print())
                 //then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(3)))
-                .andExpect(jsonPath("$.totalElements").value(3))
-                .andExpect(jsonPath("$.totalPages").value(2)).andReturn();
+                .andExpect(jsonPath("$.content", hasSize(listTodo.size())))
+                .andExpect(jsonPath("$.totalElements").value(listTodo.size()))
+                .andExpect(jsonPath("$.totalPages").value(2));
 
     }
 
@@ -106,7 +103,6 @@ public class StandaloneTodoRestControllerTest {
     @Test
     public void getOne_TodoFound_returns200() throws Exception {
         //given
-        Todo todo1 = new Todo(1L, "nazwa1", "priorytet1", "opis1", true);
         when(fakeRepository.findById(1L))
                 .thenReturn(Optional.of(todo1));
         //when
@@ -133,6 +129,7 @@ public class StandaloneTodoRestControllerTest {
         //when
         mockMvc.perform(post(URL)
                         .contentType(APPLICATION_JSON)
+                        .content(TestJsonUtils.convertObjectToJson(todo))
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 //then

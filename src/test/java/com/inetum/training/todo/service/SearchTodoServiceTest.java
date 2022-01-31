@@ -44,16 +44,16 @@ public class SearchTodoServiceTest {
         //given
         Pageable pageable = PageRequest.of(0, 2);
         PageImpl<Todo> pageImp = new PageImpl<>(listTodo, pageable, listTodo.size());
-        TodoSearchParamsDto searchParams = new TodoSearchParamsDto("nazwa", null, pageable);
-        when(fakeRepository.findAllByNameContaining(eq("nazwa"), eq(pageable)))
+        TodoSearchParamsDto searchParams = new TodoSearchParamsDto("nazwa", null);
+        when(fakeRepository.findAllByName(eq("nazwa"), eq(pageable)))
                 .thenReturn(pageImp);
         //when
-        Page<Todo> todoPage = searchService.find(searchParams);
+        Page<Todo> todoPage = searchService.find(searchParams, pageable);
         //then
         assertThat(todoPage.getContent()).hasSize(3);
         assertThat(todoPage.getContent()).containsAll(listTodo);
         verify(fakeRepository, times(1))
-                .findAllByNameContaining(anyString(), any(Pageable.class));
+                .findAllByName(anyString(), any(Pageable.class));
     }
 
     @Test
@@ -61,16 +61,16 @@ public class SearchTodoServiceTest {
         //given
         Pageable pageable = PageRequest.of(0, 2);
         PageImpl<Todo> pageImp = new PageImpl<>(listTodo, pageable, listTodo.size());
-        TodoSearchParamsDto searchParams = new TodoSearchParamsDto(null,"priorytet", pageable);
-        when(fakeRepository.findAllByPriorityContaining(eq("priorytet"), eq(pageable)))
+        TodoSearchParamsDto searchParams = new TodoSearchParamsDto(null,"priorytet");
+        when(fakeRepository.findAllByPriority(eq("priorytet"), eq(pageable)))
                 .thenReturn(pageImp);
         //when
-        Page<Todo> todoPage = searchService.find(searchParams);
+        Page<Todo> todoPage = searchService.find(searchParams, pageable);
         //then
         assertThat(todoPage.getContent()).hasSize(3);
         assertThat(todoPage.getContent()).containsAll(listTodo);
         verify(fakeRepository, times(1))
-                .findAllByPriorityContaining(anyString(), any(Pageable.class));
+                .findAllByPriority(anyString(), any(Pageable.class));
     }
 
     @Test
@@ -78,16 +78,16 @@ public class SearchTodoServiceTest {
         //given
         Pageable pageable = PageRequest.of(0, 2);
         PageImpl<Todo> pageImp = new PageImpl<>(listTodo, pageable, listTodo.size());
-        TodoSearchParamsDto searchParams = new TodoSearchParamsDto("nazwa", "priorytet", pageable);
-        when(fakeRepository.findAllByNameAndPriorityContaining(eq("nazwa"), eq("priorytet"), eq(pageable)))
+        TodoSearchParamsDto searchParams = new TodoSearchParamsDto("nazwa", "priorytet");
+        when(fakeRepository.findAllByNameAndPriority(eq("nazwa"), eq("priorytet"), eq(pageable)))
                 .thenReturn(pageImp);
         //when
-        Page<Todo> todoPage = searchService.find(searchParams);
+        Page<Todo> todoPage = searchService.find(searchParams, pageable);
         //then
         assertThat(todoPage.getContent()).hasSize(3);
         assertThat(todoPage.getContent()).containsAll(listTodo);
         verify(fakeRepository, times(1))
-                .findAllByNameAndPriorityContaining(anyString(), anyString(), any(Pageable.class));
+                .findAllByNameAndPriority(anyString(), anyString(), any(Pageable.class));
     }
 
 
@@ -97,16 +97,16 @@ public class SearchTodoServiceTest {
         //given
         Pageable pageable = PageRequest.of(0, 2);
         PageImpl<Todo> pageImp = new PageImpl<>(expectedListTodo, pageable, expectedListTodo.size());
-        TodoSearchParamsDto searchParams = new TodoSearchParamsDto(findName, findPriority, pageable);
-        when(fakeRepository.findAllByNameAndPriorityContaining(eq(findName), eq(findPriority), eq(pageable)))
+        TodoSearchParamsDto searchParams = new TodoSearchParamsDto(findName, findPriority);
+        when(fakeRepository.findAllByNameAndPriority(eq(findName), eq(findPriority), eq(pageable)))
                 .thenReturn(pageImp);
         //when
-        Page<Todo> todoPage = searchService.find(searchParams);
+        Page<Todo> todoPage = searchService.find(searchParams, pageable);
         //then
         assertThat(todoPage.getContent()).hasSize(expectedElements);
         assertThat(todoPage.getContent()).containsAll(expectedListTodo);
         verify(fakeRepository, times(1))
-                .findAllByNameAndPriorityContaining(anyString(), anyString(), any(Pageable.class));
+                .findAllByNameAndPriority(anyString(), anyString(), any(Pageable.class));
     }
 
     private static Stream<Arguments> generateEmptyData() {
@@ -122,16 +122,16 @@ public class SearchTodoServiceTest {
         //given
         Pageable pageable = PageRequest.of(0, 2);
         //PageImpl<Todo> pageImp = new PageImpl<>(listTodo, pageable, listTodo.size());
-        TodoSearchParamsDto searchParams = new TodoSearchParamsDto(input, input, pageable);
-        when(fakeRepository.findAllByNameAndPriorityContaining(eq(input), eq(input), eq(pageable)))
+        TodoSearchParamsDto searchParams = new TodoSearchParamsDto(input, input);
+        when(fakeRepository.findAllByNameAndPriority(eq(input), eq(input), eq(pageable)))
                 .thenReturn(Page.empty());
         //when
-        Page<Todo> todoPage = searchService.find(searchParams);
+        Page<Todo> todoPage = searchService.find(searchParams, pageable);
         //then
         assertThat(todoPage.getContent()).hasSize(0);
         assertThat(todoPage.getContent()).containsAll(Page.empty());
         verify(fakeRepository, times(1))
-                .findAllByNameAndPriorityContaining(anyString(), anyString(), any(Pageable.class));
+                .findAllByNameAndPriority(anyString(), anyString(), any(Pageable.class));
     }
 
 

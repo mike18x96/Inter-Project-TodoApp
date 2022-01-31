@@ -4,6 +4,8 @@ import com.inetum.training.todo.domain.Todo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
@@ -17,8 +19,8 @@ public interface TodoJpaRepository extends JpaRepository<Todo, Long> {
 //            @Param("name") String name,
 //            @Param("priority") String priority);
 
-    Page<Todo> findAllByNameContaining(String name, Pageable pageable);
-    Page<Todo> findAllByPriorityContaining(String priority, Pageable pageable);
-    Page<Todo> findAllByNameAndPriorityContaining(String name, String priority, Pageable pageable);
+    Page<Todo> findAllByName(String name, Pageable pageable);
+    Page<Todo> findAllByPriority(String priority, Pageable pageable);
+    Page<Todo> findAllByNameAndPriority(String name, String priority, Pageable pageable);
 
 }

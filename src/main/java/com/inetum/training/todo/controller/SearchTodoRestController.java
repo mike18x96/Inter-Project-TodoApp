@@ -22,6 +22,6 @@ public class SearchTodoRestController {
     public Page<Todo> getAll(@RequestParam(value="name", required = false) String name,
                              @RequestParam(value="priority", required = false) String priority,
                              Pageable pageable){
-        return searchService.find(new TodoSearchParamsDto(name, priority, pageable));
+        return searchService.find(new TodoSearchParamsDto(name, priority), pageable);
     }
 }
