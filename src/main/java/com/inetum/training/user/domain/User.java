@@ -1,5 +1,6 @@
 package com.inetum.training.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ import java.io.Serializable;
 @Entity
 @Data
 @Builder
-@Table(name="USERS")
+@Table(name = "User")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 6760276400659841526L;
@@ -22,12 +23,17 @@ public class User implements Serializable {
         USER, ADMIN
     }
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @NotNull
     @NotBlank
-    @Id
-    @Column(name = "login")
     private String login;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotNull
+    @NotBlank
     private String passwordHash;
 
     @NotNull

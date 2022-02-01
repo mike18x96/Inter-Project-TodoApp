@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter{
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -38,10 +38,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.httpBasic();
+        http.headers().frameOptions().disable();
         http.authorizeRequests()
 //                .antMatchers("/users").hasRole("ADMIN")
 //                .antMatchers("/todos/**").hasAnyRole("ADMIN", "USER")
-//                .antMatchers("/search/todos/**").hasAnyRole("ADMIN", "USER");
+//                .antMatchers("/search/todos/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/actuator/info", "/actuator/health").permitAll()
                 .anyRequest().fullyAuthenticated();
     }

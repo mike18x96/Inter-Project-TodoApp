@@ -14,13 +14,13 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @Builder
 @Entity
-@Table(name = "TODOS")
+@Table(name = "Todo")
 public class Todo implements Serializable{
 
     private static final long serialVersionUID = 376436963768417453L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -28,6 +28,9 @@ public class Todo implements Serializable{
     private String priority;
     private String description;
     private boolean completed;
+
+    @ManyToOne
+    private User user;
 
 
 

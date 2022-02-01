@@ -1,14 +1,13 @@
 package com.inetum.training.todo.controller;
 
 import com.inetum.training.todo.domain.Todo;
-import com.inetum.training.todo.persistance.TodoJpaRepository;
+import com.inetum.training.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 @RestController
@@ -16,50 +15,34 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class TodoRestController {
 
-    private final TodoJpaRepository todoRepository;
+    private final TodoService todoService;
 
     @RequestMapping(method = RequestMethod.GET)
     public Page<Todo> getAll(Pageable pageable) {
-
-        return todoRepository.findAll(pageable);
+        return todoService.findAll(pageable);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public Long create(@RequestBody @Valid Todo todo) {
         todo.setId(null);
-        return todoRepository.save(todo).getId();
+        return todoService.save(todo);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Todo get(@PathVariable("id") Long id) {
-        return todoRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return todoService.findById(id);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public void update(@RequestBody @Valid Todo todo, @PathVariable("id") Long id) {
-        if (todoRepository.existsById(id)) {
-            todo.setId(id);
-            todoRepository.save(todo);
-        } else {
-            throw new EntityNotFoundException();
-        }
+        todoService.update(todo, id);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id) {
-        if (todoRepository.existsById(id)) {
-            todoRepository.deleteById(id);
-        } else {
-            throw new EntityNotFoundException();
-        }
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public String notFoundHandler() {
-        return "nie znaleziono elementu o podanym id";
+        todoService.delete(id);
     }
 
 }

@@ -24,6 +24,9 @@ public class CurrentUser implements UserDetails {
     private static final long serialVersionUID = 6608807423798767487L;
 
     @NonNull
+    private Long id;
+
+    @NonNull
     private String login;
 
     @NonNull
