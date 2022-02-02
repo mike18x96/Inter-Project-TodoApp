@@ -1,5 +1,6 @@
 package com.inetum.training.todo.service;
 
+import com.inetum.training.security.model.CurrentUser;
 import com.inetum.training.todo.controller.dto.TodoSearchParamsDto;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
@@ -12,18 +13,40 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SearchTodoService {
 
-    private final TodoJpaRepository todoRepository;
+    private final TodoJpaRepository todoJpaRepository;
+    private final TodoService todoService;
+    private Page<Todo> pageOfTodo;
 
-    public Page<Todo> find(TodoSearchParamsDto searchParams, Pageable pageable) {
-        Page<Todo> pageOfTodo;
+    public Page<Todo> findByADMIN(TodoSearchParamsDto searchParams, Pageable pageable) {
         if (searchParams.getPriority() == null) {
-            pageOfTodo = todoRepository.findAllByName(searchParams.getName(), pageable);
+            pageOfTodo = todoJpaRepository.findAllByName(searchParams.getName(), pageable);
         } else if (searchParams.getName() == null) {
-            pageOfTodo = todoRepository.findAllByPriority(searchParams.getPriority(), pageable);
+            pageOfTodo = todoJpaRepository.findAllByPriority(searchParams.getPriority(), pageable);
         } else {
-            pageOfTodo = todoRepository.findAllByNameAndPriority(searchParams.getName(), searchParams.getPriority(), pageable);
+            pageOfTodo = todoJpaRepository.findAllByNameAndPriority(searchParams.getName(), searchParams.getPriority(), pageable);
         }
         return pageOfTodo;
     }
+
+    public Page<Todo> findByUSER(TodoSearchParamsDto searchParams, Pageable pageable) {
+        Page<Todo> pageOfTodo;
+        if (searchParams.getPriority() == null) {
+            pageOfTodo = todoJpaRepository.findAllByNameAndUserId(searchParams.getName(), todoService.getCurrentUser().getId(), pageable);
+        } else if (searchParams.getName() == null) {
+            pageOfTodo = todoJpaRepository.findAllByPriorityAndUserId(searchParams.getPriority(), todoService.getCurrentUser().getId(), pageable);
+        } else {
+            pageOfTodo = todoJpaRepository.findAllByNameAndPriorityAndUserId(searchParams.getName(), searchParams.getPriority(), todoService.getCurrentUser().getId(), pageable);
+        }
+        return pageOfTodo;
+    }
+
+    public Page<Todo> find(TodoSearchParamsDto searchParams, Pageable pageable) {
+        if ((todoService.getCurrentUser().getRole()).equals("ROLE_ADMIN")) {
+            return findByADMIN(searchParams, pageable);
+        } else {
+            return findByUSER(searchParams, pageable);
+        }
+    }
+
 
 }

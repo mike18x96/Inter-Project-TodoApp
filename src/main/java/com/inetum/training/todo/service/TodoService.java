@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,19 +25,46 @@ public class TodoService {
     private final UserRepository userRepository;
 
     public Page<Todo> findAll(Pageable pageable) {
-        return todoJpaRepository.findAll(pageable);
+        if ((getCurrentUser().getRole()).equals("ROLE_USER")) {
+            return todoJpaRepository.findAllByUserId(getCurrentUser().getId(), pageable);
+        } else {
+            return todoJpaRepository.findAll(pageable);
+        }
     }
 
-    public Todo findById(Long id) {
-        return todoJpaRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public Optional<Todo> findById(Long id) {
+        if (todoJpaRepository.existsById(id)) {
+            if ((getCurrentUser().getRole()).equals("ROLE_ADMIN")) {
+                return todoJpaRepository.findById(id);
+            }
+            if ((getCurrentUser().getId() == todoJpaRepository.findById(id).get().getUser().getId())) {
+                return todoJpaRepository.findById(id);
+            }
+        }else{
+            throw new EntityNotFoundException();
+        }
+        return null;
     }
+
+
 
     public boolean existsById(Long id) {
         return todoJpaRepository.existsById(id);
     }
 
+//    public void deleteById(Long id) {
+//        todoJpaRepository.deleteById(id);
+//    }
+
     public void deleteById(Long id) {
-        todoJpaRepository.deleteById(id);
+        if (todoJpaRepository.existsById(id)) {
+            if ((getCurrentUser().getRole()).equals("ROLE_ADMIN")) {
+                todoJpaRepository.deleteById(id);
+            }
+            if ((getCurrentUser().getId() == todoJpaRepository.findById(id).get().getUser().getId())) {
+                todoJpaRepository.deleteById(id);
+            }
+        }
     }
 
     public Long save(Todo todo) {
@@ -67,7 +95,7 @@ public class TodoService {
         return "nie znaleziono elementu o podanym id";
     }
 
-    private CurrentUser getCurrentUser() {
+    CurrentUser getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (CurrentUser) auth.getPrincipal();
     }

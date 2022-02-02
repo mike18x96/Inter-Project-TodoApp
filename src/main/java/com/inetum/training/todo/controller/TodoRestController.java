@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/todos")
@@ -30,7 +31,7 @@ public class TodoRestController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Todo get(@PathVariable("id") Long id) {
+    public Optional<Todo> get(@PathVariable("id") Long id) {
         return todoService.findById(id);
     }
 
