@@ -31,12 +31,19 @@ public class UserRestController {
         return userService.save(user);
     }
 
-    @PutMapping("resetUserPassword/{id}")
-    public String updateUserPassword(@PathVariable("id") Long id) {
-        return userService.updateUserPassword(id);
+    @PutMapping("resetPassword/{id}")
+    public String updatePasswordByAdmin(@PathVariable("id") Long id) {
+        return userService.updatePasswordByAdmin(id);
     }
-    @PutMapping("updateUserRole/{id}/{role}")
-    public String updateUserRole(@PathVariable("id") Long id, @PathVariable("role")String role) {
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("resetUserPasswordByUser/{loginUser}/{oldPassword}")
+    public String updatePasswordByUser(@PathVariable("loginUser") String loginUser, @PathVariable("oldPassword") String oldPassword) {
+        return userService.updatePasswordByUser(loginUser, oldPassword);
+    }
+
+    @PutMapping("updateRoleByAdmin/{id}/{role}")
+    public String updateUserRole(@PathVariable("id") Long id, @PathVariable("role") String role) {
         return userService.updateUserPermissions(id, role);
     }
 

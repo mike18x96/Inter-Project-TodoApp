@@ -6,7 +6,6 @@ import com.inetum.training.user.controller.dto.UserToUserDtoConverter;
 import com.inetum.training.user.domain.User;
 import com.inetum.training.user.persistance.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -52,7 +51,7 @@ public class UserService {
         return userRepository.save(user).getId();
     }
 
-    public String updateUserPassword(Long id) {
+    public String updatePasswordByAdmin(Long id) {
         if (userRepository.existsById(id)) {
             User user = userRepository.findById(id).get();
             String beforeEncodePassword = generatePassword(10);
@@ -60,6 +59,29 @@ public class UserService {
             user.setPasswordHash((encoderPassword));
             userRepository.save(user);
             return beforeEncodePassword;
+        } else {
+            throw new EntityNotFoundException();
+        }
+    }
+
+    public String updatePasswordByUser(String loginUser, String oldPassword) {
+
+        if ((getCurrentUser().getRole()).equals("ROLE_ADMIN")) {
+            return "wrong URL to change Admin password";
+        }
+
+        if (getCurrentUser().getLogin().equals(loginUser)) {
+            User user = userRepository.findByLogin(loginUser).get();
+
+            if (passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
+                String beforeEncodePassword = generatePassword(10);
+                String encoderPassword = passwordEncoder.encode(beforeEncodePassword);
+                user.setPasswordHash((encoderPassword));
+                userRepository.save(user);
+                return "password: " + beforeEncodePassword;
+            } else {
+                return "Wrong password";
+            }
         } else {
             throw new EntityNotFoundException();
         }
@@ -88,9 +110,15 @@ public class UserService {
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public String notFoundHandler() {
-        return "nie znaleziono elementu o podanym id";
+    public String notFoundEntityHandler() {
+        return "Not found object with this id";
     }
+
+//    @ExceptionHandler(LoginException.class)
+//    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+//    public String notFoundLoginHandler() {
+//        return "Not found login";
+//    }
 
     CurrentUser getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
