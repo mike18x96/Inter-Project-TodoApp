@@ -8,11 +8,14 @@ import lombok.Getter;
 @Getter
 public class UserDto {
 
+    private Long id;
     private String login;
     private User.Role role;
 
     public UserDto(User user) {
+        id = user.getId();
         login = user.getLogin();
         role = user.getRole();
     }
+
 }

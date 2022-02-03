@@ -44,7 +44,7 @@ public class UserService {
     public Page<UserDto> findAll(Pageable pageRequest) {
         Page<User> userPage = userRepository.findAll(pageRequest);
         final UserToUserDtoConverter user2UserDtoConverter = new UserToUserDtoConverter();
-        return userPage.map(user2UserDtoConverter::convert);
+        return userPage.map(user -> user2UserDtoConverter.convert(user));
     }
 
     public Long save(User user) {
@@ -98,10 +98,6 @@ public class UserService {
         }
     }
 
-    public boolean existsById(Long id) {
-        return userRepository.existsById(id);
-    }
-
     public String generatePassword(int length) {
         return new Random().ints(length, 33, 122).collect(StringBuilder::new,
                         StringBuilder::appendCodePoint, StringBuilder::append)
@@ -113,12 +109,6 @@ public class UserService {
     public String notFoundEntityHandler() {
         return "Not found object with this id";
     }
-
-//    @ExceptionHandler(LoginException.class)
-//    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-//    public String notFoundLoginHandler() {
-//        return "Not found login";
-//    }
 
     CurrentUser getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

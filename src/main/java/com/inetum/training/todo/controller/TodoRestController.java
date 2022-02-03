@@ -1,5 +1,6 @@
 package com.inetum.training.todo.controller;
 
+import com.inetum.training.todo.controller.dto.TodoDtoWithoutUser;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class TodoRestController {
     private final TodoService todoService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public Page<Todo> getAll(Pageable pageable) {
+    public Page<TodoDtoWithoutUser> getAll(Pageable pageable) {
         return todoService.findAll(pageable);
     }
 

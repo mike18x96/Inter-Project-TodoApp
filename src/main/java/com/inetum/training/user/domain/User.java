@@ -31,7 +31,7 @@ public class User implements Serializable {
     @NotBlank
     private String login;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     @NotBlank
     private String passwordHash;

@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Builder
 @Entity
 @Table(name = "Todo")
-public class Todo implements Serializable{
+public class Todo implements Serializable {
 
     private static final long serialVersionUID = 376436963768417453L;
 
@@ -28,11 +28,11 @@ public class Todo implements Serializable{
     private String priority;
     private String description;
     private boolean completed;
+    //private Long userId;// = getUserId();
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
-
-
 
 
 }

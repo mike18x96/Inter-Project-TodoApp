@@ -1,6 +1,8 @@
 package com.inetum.training.todo.service;
 
 import com.inetum.training.security.model.CurrentUser;
+import com.inetum.training.todo.controller.dto.Todo2TodoWithoutUserDtoConverter;
+import com.inetum.training.todo.controller.dto.TodoDtoWithoutUser;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
 import com.inetum.training.user.persistance.UserRepository;
@@ -24,11 +26,15 @@ public class TodoService {
     private final TodoJpaRepository todoJpaRepository;
     private final UserRepository userRepository;
 
-    public Page<Todo> findAll(Pageable pageable) {
+    public Page<TodoDtoWithoutUser> findAll(Pageable pageable) {
+        Page<Todo> todoPageOnlyUser = todoJpaRepository.findAllByUserId(getCurrentUser().getId(), pageable);
+        Page<Todo> todoPageUserAdmin = todoJpaRepository.findAll(pageable);
+        final Todo2TodoWithoutUserDtoConverter todo2TodoWithoutUserDtoConverter = new Todo2TodoWithoutUserDtoConverter();
+
         if ((getCurrentUser().getRole()).equals("ROLE_USER")) {
-            return todoJpaRepository.findAllByUserId(getCurrentUser().getId(), pageable);
+            return todoPageOnlyUser.map(todo -> todo2TodoWithoutUserDtoConverter.convert(todo));
         } else {
-            return todoJpaRepository.findAll(pageable);
+            return todoPageUserAdmin.map(todo -> todo2TodoWithoutUserDtoConverter.convert(todo));
         }
     }
 
