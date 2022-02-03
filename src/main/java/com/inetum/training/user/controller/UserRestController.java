@@ -1,9 +1,8 @@
 package com.inetum.training.user.controller;
 
 import com.inetum.training.user.controller.dto.UserDto;
-import com.inetum.training.user.controller.dto.UserToUserDtoConverter;
 import com.inetum.training.user.domain.User;
-import com.inetum.training.user.persistance.UserRepository;
+import com.inetum.training.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,19 +18,32 @@ import javax.validation.Valid;
 @PreAuthorize("hasRole('ADMIN')")
 public class UserRestController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping
     public Page<UserDto> getAllWithoutPassword(Pageable pageRequest) {
-        Page<User> userPage = userRepository.findAll(pageRequest);
-        final UserToUserDtoConverter user2UserDtoConverter = new UserToUserDtoConverter();
-        return userPage.map(user2UserDtoConverter::convert);
+        return userService.findAll(pageRequest);
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String create(@RequestBody @Valid User user) {
-        return userRepository.save(user).getLogin();
+    public Long create(@RequestBody @Valid User user) {
+        return userService.save(user);
+    }
+
+    @PutMapping("resetUserPassword/{id}")
+    public String updateUserPassword(@PathVariable("id") Long id) {
+        return userService.updateUserPassword(id);
+    }
+    @PutMapping("updateUserRole/{id}/{role}")
+    public String updateUserRole(@PathVariable("id") Long id, @PathVariable("role")String role) {
+        return userService.updateUserPermissions(id, role);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable("id") Long id) {
+        userService.deleteByIdForAdmin(id);
     }
 
 }

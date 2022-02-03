@@ -46,15 +46,9 @@ public class TodoService {
         return null;
     }
 
-
-
     public boolean existsById(Long id) {
         return todoJpaRepository.existsById(id);
     }
-
-//    public void deleteById(Long id) {
-//        todoJpaRepository.deleteById(id);
-//    }
 
     public void deleteById(Long id) {
         if (todoJpaRepository.existsById(id)) {

@@ -1,6 +1,5 @@
 package com.inetum.training.todo.service;
 
-import com.inetum.training.security.model.CurrentUser;
 import com.inetum.training.todo.controller.dto.TodoSearchParamsDto;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;

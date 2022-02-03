@@ -1,12 +1,9 @@
 package com.inetum.training.todo.persistance;
 
-import com.inetum.training.security.model.CurrentUser;
 import com.inetum.training.todo.domain.Todo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
@@ -24,7 +21,6 @@ public interface TodoJpaRepository extends JpaRepository<Todo, Long> {
     Page<Todo> findAllByPriority(String priority, Pageable pageable);
     Page<Todo> findAllByNameAndPriority(String name, String priority, Pageable pageable);
     Page<Todo> findAllByUserId(Long id, Pageable pageable);
-    Todo findByUserId(Long id);
 
     Page<Todo> findAllByNameAndUserId(String name, Long id, Pageable pageable);
     Page<Todo> findAllByPriorityAndUserId(String priority, Long id,Pageable pageable);
