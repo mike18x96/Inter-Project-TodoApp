@@ -1,8 +1,5 @@
 package com.inetum.training.user.controller;
 
-import com.inetum.training.security.model.CurrentUser;
-import com.inetum.training.todo.controller.TodoRestController;
-import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.user.controller.dto.UserDto;
 import com.inetum.training.user.domain.User;
 import com.inetum.training.user.service.UserService;
@@ -44,17 +41,11 @@ public class UserControllerTest {
     private MockMvc mockMvc;
     public static final String URL = "/users";
 
-    private static final CurrentUser currentUserUSER = new CurrentUser(1l, "henio", "henio", "ROLE_" + USER);
-
     private static final User USER_TEST = new User(1L, "henio", "henio", USER);
-    private static final User ADMIN_TEST = new User(2L, "admin", "admin", ADMIN);
-    private static final User NEW_USER_TEST = new User(1L, "henio", "password", USER);
-    private static final List<User> listUser = List.of(USER_TEST, ADMIN_TEST);
 
     private static final UserDto USER_DTO_TEST = new UserDto(1L, "henio", USER);
     private static final UserDto ADMIN_DTO_TEST = new UserDto(2L, "admin", ADMIN);
     private static final List<UserDto> LIST_USER_DTO = List.of(USER_DTO_TEST, ADMIN_DTO_TEST);
-
 
     @BeforeEach
     public void setUp() {
@@ -165,11 +156,11 @@ public class UserControllerTest {
         verifyNoMoreInteractions(userService);
     }
 
-    @Test
-    @WithMockUser(value = "henio")
-    public void updatePasswordByUser_badLogin_returns403() throws Exception {
-        //given
-        //when
+//    @Test
+//    @WithMockUser(value = "henio")
+//    public void updatePasswordByUser_badLogin_returns403() throws Exception {
+//        //given
+//        //when
 //        mockMvc.perform(put(URL + "/resetUserPasswordByUser" + "/badLogin" + "/" + USER_TEST.getPasswordHash())
 //                        .contentType(APPLICATION_JSON)).andReturn()
 //                .andDo(print())
@@ -178,12 +169,12 @@ public class UserControllerTest {
 //                .andExpect(jsonPath("$", is(String.format("generatedPassword"))));
 //        verify(userService, times(1)).updatePasswordByUser(USER_TEST.getLogin(), USER_TEST.getPasswordHash());
 //        verifyNoMoreInteractions(userService);
-    }
+//    }
 
-    @Test
-    public void updatePasswordByUser_correctLoginButAdmin_returns403() throws Exception {
-
-    }
+//    @Test
+//    public void updatePasswordByUser_correctLoginButAdmin_returns403() throws Exception {
+//
+//    }
 
     @Test
     public void updateUserRoleByAdmin_correctId_returns200() throws Exception {

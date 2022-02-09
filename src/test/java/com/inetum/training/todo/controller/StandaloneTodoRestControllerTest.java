@@ -238,8 +238,5 @@ public class StandaloneTodoRestControllerTest {
         verify(todoService, times(1)).delete(anyLong());
         verifyNoMoreInteractions(todoService);
 
-
     }
-
-
 }
