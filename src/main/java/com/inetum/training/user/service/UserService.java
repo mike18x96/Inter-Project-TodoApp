@@ -50,22 +50,19 @@ public class UserService {
         }
     }
 
-    public String updatePasswordByUser(String loginUser, String oldPassword) {
+    public String updatePasswordByUser(String loginUser) {
 
         User user = userRepository.findByLogin(loginUser).get();
 
-        if (passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
-            String beforeEncodePassword = generatePassword(10);
-            String encoderPassword = passwordEncoder.encode(beforeEncodePassword);
-            user.setPasswordHash((encoderPassword));
-            userRepository.save(user);
-            return "password: " + beforeEncodePassword;
-        } else {
-            return "Wrong password";
-        }
+        String beforeEncodePassword = generatePassword(10);
+        String encoderPassword = passwordEncoder.encode(beforeEncodePassword);
+        user.setPasswordHash((encoderPassword));
+        userRepository.save(user);
+        return "password: " + beforeEncodePassword;
+
     }
 
-    public String updateUserPermissions(Long id, String role) {
+    public String updateUserRole(Long id, String role) {
         if (userRepository.existsById(id)) {
             User user = userRepository.findById(id).get();
             user.setRole(User.Role.valueOf(role.toUpperCase(Locale.ROOT)));
@@ -76,10 +73,10 @@ public class UserService {
         }
     }
 
-    public void deleteByIdForAdmin(Long id) {
+    public String deleteByIdForAdmin(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
-
+            return "User deleted";
         } else {
             throw new EntityNotFoundException();
         }

@@ -115,15 +115,13 @@ class UserServiceTest {
     void updatePasswordByUser_correctReset_returnNewPassword() {
         //given
         when(userRepository.findByLogin(anyString())).thenReturn(Optional.of(USER_TEST));
-        when(passwordEncoder.matches(any(), any())).thenReturn(true);
         when(passwordEncoder.encode(any())).thenReturn(any());
         when(userRepository.save(NEW_USER_TEST)).thenReturn(NEW_USER_TEST);
 
         //when
-        String passwordUser = userService.updatePasswordByUser(currentUserUSER.getLogin(), anyString());
+        String passwordUser = userService.updatePasswordByUser(currentUserUSER.getLogin());
         //then
         verify(userRepository, times(1)).findByLogin(anyString());
-        verify(passwordEncoder, times(1)).matches(any(), any());
         verify(passwordEncoder, times(1)).encode(any());
         verify(userRepository, times(1)).save(any());
         verifyNoMoreInteractions(userRepository);
@@ -136,7 +134,7 @@ class UserServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(USER_TEST));
         when(userRepository.save(USER_TEST)).thenReturn(USER_TEST);
         //when
-        String newRole = userService.updateUserPermissions(USER_TEST.getId(), "ADMIN");
+        String newRole = userService.updateUserRole(USER_TEST.getId(), "ADMIN");
         //then
         verify(userRepository, times(1)).existsById(anyLong());
         verify(userRepository, times(1)).findById(anyLong());
@@ -149,7 +147,7 @@ class UserServiceTest {
         //given
         when(userRepository.existsById(anyLong())).thenReturn(false);
         //when
-        assertThatThrownBy(() -> userService.updateUserPermissions(USER_TEST.getId(), "ADMIN"))
+        assertThatThrownBy(() -> userService.updateUserRole(USER_TEST.getId(), "ADMIN"))
                 .isInstanceOf(EntityNotFoundException.class);
         //then
         verify(userRepository, times(1)).existsById(anyLong());
