@@ -9,12 +9,9 @@ import com.inetum.training.user.persistance.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
@@ -25,12 +22,13 @@ public class TodoService {
 
     private final TodoJpaRepository todoJpaRepository;
     private final UserRepository userRepository;
+//    private final Todo2TodoWithoutUserDtoConverter todo2TodoWithoutUserDtoConverter;
+
 
     public Page<TodoDtoWithoutUser> findAll(Pageable pageable) {
         Page<Todo> todoPageOnlyUser = todoJpaRepository.findAllByUserId(getCurrentUser().getId(), pageable);
         Page<Todo> todoPageUserAdmin = todoJpaRepository.findAll(pageable);
-        final Todo2TodoWithoutUserDtoConverter todo2TodoWithoutUserDtoConverter = new Todo2TodoWithoutUserDtoConverter();
-
+        Todo2TodoWithoutUserDtoConverter todo2TodoWithoutUserDtoConverter = new Todo2TodoWithoutUserDtoConverter();
         if ((getCurrentUser().getRole()).equals("ROLE_USER")) {
             return todoPageOnlyUser.map(todo -> todo2TodoWithoutUserDtoConverter.convert(todo));
         } else {
@@ -38,18 +36,23 @@ public class TodoService {
         }
     }
 
-    public Optional<Todo> findById(Long id) {
+    public TodoDtoWithoutUser findById(Long id) {
+
         if (todoJpaRepository.existsById(id)) {
+            Todo2TodoWithoutUserDtoConverter todo2TodoWithoutUserDtoConverter = new Todo2TodoWithoutUserDtoConverter();
+            Todo todo = null;
             if ((getCurrentUser().getRole()).equals("ROLE_ADMIN")) {
-                return todoJpaRepository.findById(id);
+                todo = todoJpaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
             }
             if ((getCurrentUser().getId() == todoJpaRepository.findById(id).get().getUser().getId())) {
-                return todoJpaRepository.findById(id);
+                todo = todoJpaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
             }
-        }else{
+            return todo2TodoWithoutUserDtoConverter.convert(todo);
+
+        } else {
             throw new EntityNotFoundException();
         }
-        return null;
+
     }
 
     public boolean existsById(Long id) {
@@ -72,27 +75,23 @@ public class TodoService {
         return todoJpaRepository.save(todo).getId();
     }
 
-    public void update(Todo todo, Long id) {
+    public String update(Todo todo, Long id){
         if (existsById(id)) {
             todo.setId(id);
             save(todo);
         } else {
             throw new EntityNotFoundException();
         }
+        return "Todo updated!";
     }
 
-    public void delete(Long id) {
+    public String delete(Long id) {
         if (existsById(id)) {
             deleteById(id);
         } else {
             throw new EntityNotFoundException();
         }
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public String notFoundHandler() {
-        return "nie znaleziono elementu o podanym id";
+        return "Todo deleted";
     }
 
     CurrentUser getCurrentUser() {

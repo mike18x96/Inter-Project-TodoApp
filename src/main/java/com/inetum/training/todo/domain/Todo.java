@@ -28,11 +28,9 @@ public class Todo implements Serializable {
     private String priority;
     private String description;
     private boolean completed;
-    //private Long userId;// = getUserId();
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
 
 }

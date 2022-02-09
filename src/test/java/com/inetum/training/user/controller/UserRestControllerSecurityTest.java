@@ -22,13 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class UserRestControllerSecurityTest {
 
-    //------------------ŁADUJEMY CALY CONTEXT!!!-------------------------//
-
     @Autowired
     private WebApplicationContext context;
-
-//    @Mock
-//    private UserRepository repository;
 
     private static final String URL = "/users";
 

@@ -36,7 +36,7 @@ public class UserRestController {
         return userService.updatePasswordByAdmin(id);
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') and  (#loginUser == authentication.principal.username)")
     @PutMapping("resetUserPasswordByUser/{loginUser}/{oldPassword}")
     public String updatePasswordByUser(@PathVariable("loginUser") String loginUser, @PathVariable("oldPassword") String oldPassword) {
         return userService.updatePasswordByUser(loginUser, oldPassword);

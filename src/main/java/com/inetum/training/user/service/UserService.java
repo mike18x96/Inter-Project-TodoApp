@@ -21,30 +21,16 @@ import java.util.Locale;
 import java.util.Random;
 
 @Service
-//@RequiredArgsConstructor
 @AllArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
 
-
-    public void deleteByIdForAdmin(Long id) {
-        if (userRepository.existsById(id)) {
-            if ((getCurrentUser().getRole()).equals("ROLE_ADMIN")) {
-                userRepository.deleteById(id);
-            } else {
-                System.out.println("You are not authorized");
-            }
-        } else {
-            throw new EntityNotFoundException();
-        }
-    }
-
     public Page<UserDto> findAll(Pageable pageRequest) {
         Page<User> userPage = userRepository.findAll(pageRequest);
-        final UserToUserDtoConverter user2UserDtoConverter = new UserToUserDtoConverter();
-        return userPage.map(user -> user2UserDtoConverter.convert(user));
+        final UserToUserDtoConverter userToUserDtoConverter = new UserToUserDtoConverter();
+        return userPage.map(user -> userToUserDtoConverter.convert(user));
     }
 
     public Long save(User user) {
@@ -66,24 +52,16 @@ public class UserService {
 
     public String updatePasswordByUser(String loginUser, String oldPassword) {
 
-        if ((getCurrentUser().getRole()).equals("ROLE_ADMIN")) {
-            return "wrong URL to change Admin password";
-        }
+        User user = userRepository.findByLogin(loginUser).get();
 
-        if (getCurrentUser().getLogin().equals(loginUser)) {
-            User user = userRepository.findByLogin(loginUser).get();
-
-            if (passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
-                String beforeEncodePassword = generatePassword(10);
-                String encoderPassword = passwordEncoder.encode(beforeEncodePassword);
-                user.setPasswordHash((encoderPassword));
-                userRepository.save(user);
-                return "password: " + beforeEncodePassword;
-            } else {
-                return "Wrong password";
-            }
+        if (passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
+            String beforeEncodePassword = generatePassword(10);
+            String encoderPassword = passwordEncoder.encode(beforeEncodePassword);
+            user.setPasswordHash((encoderPassword));
+            userRepository.save(user);
+            return "password: " + beforeEncodePassword;
         } else {
-            throw new EntityNotFoundException();
+            return "Wrong password";
         }
     }
 
@@ -93,6 +71,15 @@ public class UserService {
             user.setRole(User.Role.valueOf(role.toUpperCase(Locale.ROOT)));
             userRepository.save(user);
             return role.toUpperCase(Locale.ROOT);
+        } else {
+            throw new EntityNotFoundException();
+        }
+    }
+
+    public void deleteByIdForAdmin(Long id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+
         } else {
             throw new EntityNotFoundException();
         }
@@ -110,7 +97,7 @@ public class UserService {
         return "Not found object with this id";
     }
 
-    CurrentUser getCurrentUser() {
+    private CurrentUser getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (CurrentUser) auth.getPrincipal();
     }

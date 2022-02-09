@@ -1,15 +1,20 @@
 //package com.inetum.training.user.controller;
 //
+//import com.inetum.training.security.model.CurrentUser;
+//import com.inetum.training.user.controller.dto.UserDto;
 //import com.inetum.training.user.domain.User;
-//import com.inetum.training.user.persistance.UserRepository;
+//import com.inetum.training.user.service.UserService;
 //import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Disabled;
 //import org.junit.jupiter.api.Test;
 //import org.junit.jupiter.api.extension.ExtendWith;
 //import org.mockito.Mock;
 //import org.mockito.junit.jupiter.MockitoExtension;
+//import org.springframework.data.domain.PageImpl;
+//import org.springframework.data.domain.PageRequest;
+//import org.springframework.data.domain.Pageable;
 //import org.springframework.test.web.servlet.MockMvc;
 //
-//import java.util.Arrays;
 //import java.util.List;
 //
 //import static com.inetum.training.user.domain.User.Role.ADMIN;
@@ -23,46 +28,50 @@
 //import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 //
 //@ExtendWith(MockitoExtension.class)
+//@Disabled
 //public class UserControllerTest {
 //
 //    @Mock
-//    private UserRepository userRepository;
+//    private UserService userService;
 //
 //    private MockMvc mockMvc;
 //    public static final String URL = "/users";
 //
+//    private static final CurrentUser currentUserUSER = new CurrentUser(1l, "henio", "henio", "ROLE_" + USER);
+//
+//    private static final User USER_TEST = new User(1L, "henio", "henio", USER);
+//    private static final User ADMIN_TEST = new User(2L, "admin", "admin", ADMIN);
+//    private static final User NEW_USER_TEST = new User(1L, "henio", "password", USER);
+//    private static final List<User> listUser = List.of(USER_TEST, ADMIN_TEST);
+//
+//    private static final UserDto USER_DTO_TEST = new UserDto(1L, "henio", USER);
+//    private static final UserDto ADMIN_DTO_TEST = new UserDto(2L, "admin", ADMIN);
+//    private static final List<UserDto> LIST_USER_DTO = List.of(USER_DTO_TEST, ADMIN_DTO_TEST);
+//
+//
 //    @BeforeEach
 //    public void setUp() {
-//        mockMvc = standaloneSetup(new UserRestController(userRepository))
+//        mockMvc = standaloneSetup(new UserRestController(userService))
 //                .build();
 //    }
 //
-//    private static final User user1 = new User("login1", "password1", USER);
-//    private static final User user2 = new User("login2", "password2", ADMIN);
-//
-//    List<User> listUser = Arrays.asList(user1, user2);
-//
 //    @Test
 //    public void getAll_UserFound_returnsUserWithoutPassword() throws Exception {
+//
 //        //given
-//        when(userRepository.findAll()).thenReturn(listUser);
+//        Pageable pageable = PageRequest.of(0, 2);
+//        PageImpl<UserDto> pageImp = new PageImpl<>(LIST_USER_DTO, pageable, LIST_USER_DTO.size());
+//        when(userService.findAll(pageable)).thenReturn(pageImp);
+//
 //        //when
 //        mockMvc.perform(get(URL)
-//                        .contentType(APPLICATION_JSON)
-//                        .accept(APPLICATION_JSON))
+//                        .param("page", String.valueOf(pageable.getPageNumber()))
+//                        .param("size", String.valueOf(pageable.getPageSize()))
+//                        .contentType(APPLICATION_JSON))
 //                .andDo(print())
 //                //then
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(APPLICATION_JSON))
-//                .andExpect(jsonPath("$", hasSize(2)))
-//                .andExpect(jsonPath("$[?(@.login == 'login1')].login").value("login1"))
-//                .andExpect(jsonPath("$[?(@.login == 'login2')].login").value("login2"))
-//                .andExpect(jsonPath("$[?(@.role == 'USER')].role").value("USER"))
-//                .andExpect(jsonPath("$[?(@.role == 'ADMIN')].role").value("ADMIN"))
-//                .andExpect(jsonPath("$[0].passwordHash").doesNotExist())
-//                .andExpect(jsonPath("$[1].passwordHash").doesNotExist());
-//        verify(userRepository, times(1)).findAll();
-//
+//                .andExpect(status().isOk());
+////        verify(todoService, times(1)).findAll(pageable);
 //    }
 //
 //}
