@@ -1,9 +1,11 @@
 package com.inetum.training.todo.service;
 
-import com.inetum.training.security.model.CurrentUser;
-import com.inetum.training.todo.controller.dto.TodoSearchParamsDto;
+import com.inetum.training.user.domain.dto.Todo2TodoWithoutUserDtoConverter;
+import com.inetum.training.user.domain.dto.TodoDtoWithoutUser;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
+import com.inetum.training.todo.persistance.specyfication.TodoSpecifications;
+import com.inetum.training.todo.persistance.specyfication.TodoSpecificationsBuilder;
 import com.inetum.training.user.domain.User;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +38,7 @@ public class SearchTodoServiceTest {
     private TodoJpaRepository todoJpaRepository;
 
     @Mock
-    private TodoService todoService;
+    private Todo2TodoWithoutUserDtoConverter todo2TodoWithoutUserDtoConverter;
 
     @InjectMocks
     private SearchTodoService searchTodoService;
@@ -43,183 +46,116 @@ public class SearchTodoServiceTest {
     private static final User USER_TEST = new User(1L, "henio", "henio", USER);
     private static final User ADMIN_TEST = new User(2L, "admin", "admin", ADMIN);
 
-    private static final Todo todo_1 = new Todo(1L, "nazwa", "priorytet", "opis1", true, USER_TEST);
-    private static final Todo todo_2 = new Todo(2L, "nazwa", "priorytet", "opis2", true, USER_TEST);
-    private static final List<Todo> listTodos = Arrays.asList(todo_1, todo_2);
-    private static final List<Todo> listTodosForUser = Arrays.asList(todo_1);
+    private static final Todo TODO_1 = new Todo(1L, "nazwa", "priorytet", "opis", true, USER_TEST);
+    private static final Todo TODO_2 = new Todo(2L, "nazwa", "priorytet", "opis", true, ADMIN_TEST);
+    private static final List<Todo> TODO_LIST = Arrays.asList(TODO_1, TODO_2);
 
-    private static final CurrentUser currentUserUSER = new CurrentUser(1l, "henio", "henio", "ROLE_" + USER);
-    private static final CurrentUser currentUserADMIN = new CurrentUser(2l, "admin", "admin", "ROLE_" + ADMIN);
+    private static final TodoDtoWithoutUser TODO_DTO_1 = new TodoDtoWithoutUser(1L, "nazwa", "priorytet", "opis", true, USER_TEST.getId());
+    private static final TodoDtoWithoutUser TODO_DTO_2 = new TodoDtoWithoutUser(2L, "nazwa", "priorytet", "opis", true, ADMIN_TEST.getId());
+    private static final List<TodoDtoWithoutUser> TODO_DTO_LIST = Arrays.asList(TODO_DTO_1, TODO_DTO_2);
 
     @ParameterizedTest
-    @MethodSource("generateValueByOnlyNameForAdmin")
-    public void findByAdmin_searchByNameOnly_returnsElementFoundInRepo(List<Todo> expectedTodoForAdmin, String generateName) {
+    @MethodSource("generateValueByOnlyName")
+    public void searchByParams_searchByNameOnly_returnsElementFoundInRepo(List<Todo> expectedTodo, List<TodoDtoWithoutUser> expectedTodoDto, String generateName) {
         //given
-        Pageable pageable = PageRequest.of(0, 1);
-        PageImpl<Todo> pageImp = new PageImpl<>(expectedTodoForAdmin, pageable, expectedTodoForAdmin.size());
+        TodoSpecificationsBuilder todoSpecificationsBuilder = new TodoSpecificationsBuilder();
+        todoSpecificationsBuilder.with("name", "=", generateName);
+        Specification<Todo> specification = todoSpecificationsBuilder.build();
+        Pageable pageable = PageRequest.of(0, 2);
+        PageImpl<Todo> pageImp = new PageImpl<>(expectedTodo, pageable, expectedTodo.size());
 
-        when(todoJpaRepository.findAllByName(eq(generateName), eq(pageable))).thenReturn(pageImp);
-        when(todoService.getCurrentUser()).thenReturn(currentUserADMIN);
+        when(todoJpaRepository.findAll(eq(specification), eq(pageable))).thenReturn(pageImp);
+        convertAllToDto(expectedTodo, expectedTodoDto);
+
         //when
-        Page<Todo> todoPage = searchTodoService.find(new TodoSearchParamsDto(generateName, null), pageable);
+        Page<TodoDtoWithoutUser> todoPage = searchTodoService.searchByParams(specification, pageable);
         //then
-        assertThat(todoPage.getContent()).hasSize(expectedTodoForAdmin.size());
-        assertThat(todoPage.getContent()).containsAll(expectedTodoForAdmin);
-        verify(todoJpaRepository, times(1)).findAllByName(anyString(), any());
-        verify(todoService, times(1)).getCurrentUser();
+        assertThat(todoPage.getContent()).hasSize(expectedTodo.size());
+        assertThat(todoPage.getContent()).containsAll(expectedTodoDto);
+        verify(todoJpaRepository, times(1)).findAll(any(TodoSpecifications.class), any(Pageable.class));
+        verify(todo2TodoWithoutUserDtoConverter, times(expectedTodo.size())).convert(any(Todo.class));
     }
 
-    private static Stream<Arguments> generateValueByOnlyNameForAdmin() {
+    private static Stream<Arguments> generateValueByOnlyName() {
         return Stream.of(
-                of(listTodos, "nazwa"));
+                of(TODO_LIST, TODO_DTO_LIST, "nazwa"));
     }
 
     @ParameterizedTest
-    @MethodSource("generateValueByOnlyNameForUser")
-    public void findByUser_searchByNameOnly_returnsElementFoundInRepo(List<Todo> expectedTodoForUser, String generateName) {
+    @MethodSource("generateValueByOnlyPriority")
+    public void searchByParams_searchByPriorityOnly_returnsElementFoundInRepo(List<Todo> expectedTodo, List<TodoDtoWithoutUser> expectedTodoDto, String generatePriority) {
         //given
-        Pageable pageable = PageRequest.of(0, 1);
-        PageImpl<Todo> pageImp = new PageImpl<>(expectedTodoForUser, pageable, expectedTodoForUser.size());
+        TodoSpecificationsBuilder todoSpecificationsBuilder = new TodoSpecificationsBuilder();
+        todoSpecificationsBuilder.with("priority", "=", generatePriority);
+        Specification<Todo> specification = todoSpecificationsBuilder.build();
 
-        when(todoService.getCurrentUser()).thenReturn(currentUserUSER);
-        when(todoJpaRepository.findAllByNameAndUserId
-                (eq(generateName), eq(currentUserUSER.getId()), eq(pageable))).thenReturn(pageImp);
+        Pageable pageable = PageRequest.of(0, 1);
+        PageImpl<Todo> pageImp = new PageImpl<>(expectedTodo, pageable, expectedTodo.size());
+
+        when(todoJpaRepository.findAll(eq(specification), eq(pageable))).thenReturn(pageImp);
+        convertAllToDto(expectedTodo, expectedTodoDto);
+
         //when
-        Page<Todo> todoPage = searchTodoService.find(new TodoSearchParamsDto(generateName, null), pageable);
+        Page<TodoDtoWithoutUser> todoPage = searchTodoService.searchByParams(specification, pageable);
         //then
-        assertThat(todoPage.getContent()).hasSize(expectedTodoForUser.size());
-        assertThat(todoPage.getContent()).containsAll(expectedTodoForUser);
-        verify(todoJpaRepository, times(1)).findAllByNameAndUserId(anyString(), anyLong(), any());
-        verify(todoService, times(2)).getCurrentUser();
+        assertThat(todoPage.getContent()).hasSize(expectedTodo.size());
+        assertThat(todoPage.getContent()).containsAll(expectedTodoDto);
+        verify(todoJpaRepository, times(1)).findAll(any(TodoSpecifications.class), any(Pageable.class));
+        verify(todo2TodoWithoutUserDtoConverter, times(expectedTodo.size())).convert(any(Todo.class));
     }
 
-    private static Stream<Arguments> generateValueByOnlyNameForUser() {
+    private static Stream<Arguments> generateValueByOnlyPriority() {
         return Stream.of(
-                of(listTodosForUser, "nazwa"));
+                of(TODO_LIST, TODO_DTO_LIST, "priorytet"));
     }
 
     @ParameterizedTest
-    @MethodSource("generateValueByOnlyPriorityForAdmin")
-    public void findByAdmin_searchByPriorityOnly_returnsElementFoundInRepo(List<Todo> expectedTodoForAdmin, String generatePriority) {
+    @MethodSource("generateValueByBothElement")
+    public void findByAdmin_searchByBothElement_returnsElementFoundInRepo(List<Todo> expectedTodo, List<TodoDtoWithoutUser> expectedTodoDto, String generateName, String generatePriority) {
         //given
+        TodoSpecificationsBuilder todoSpecificationsBuilder = new TodoSpecificationsBuilder();
+        todoSpecificationsBuilder.with("name", "=", generateName);
+        todoSpecificationsBuilder.with("priority", "=", generatePriority);
+        Specification<Todo> specification = todoSpecificationsBuilder.build();
         Pageable pageable = PageRequest.of(0, 1);
-        PageImpl<Todo> pageImp = new PageImpl<>(expectedTodoForAdmin, pageable, expectedTodoForAdmin.size());
-
-        when(todoJpaRepository.findAllByPriority(eq(generatePriority), eq(pageable))).thenReturn(pageImp);
-        when(todoService.getCurrentUser()).thenReturn(currentUserADMIN);
+        PageImpl<Todo> pageImp = new PageImpl<>(expectedTodo, pageable, expectedTodo.size());
+        when(todoJpaRepository.findAll(eq(specification), eq(pageable))).thenReturn(pageImp);
+        convertAllToDto(expectedTodo, expectedTodoDto);
         //when
-        Page<Todo> todoPage = searchTodoService.find(new TodoSearchParamsDto(null, generatePriority), pageable);
+        Page<TodoDtoWithoutUser> todoPage = searchTodoService.searchByParams(specification, pageable);
         //then
-        assertThat(todoPage.getContent()).hasSize(expectedTodoForAdmin.size());
-        assertThat(todoPage.getContent()).containsAll(expectedTodoForAdmin);
-        verify(todoJpaRepository, times(1)).findAllByPriority(anyString(), any());
-        verify(todoService, times(1)).getCurrentUser();
+        assertThat(todoPage.getContent()).hasSize(expectedTodoDto.size());
+        assertThat(todoPage.getContent()).containsAll(expectedTodoDto);
+        verify(todoJpaRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+        verify(todo2TodoWithoutUserDtoConverter, times(expectedTodo.size())).convert(any(Todo.class));
     }
 
-    private static Stream<Arguments> generateValueByOnlyPriorityForAdmin() {
+    private static Stream<Arguments> generateValueByBothElement() {
         return Stream.of(
-                of(listTodos, "priorytet"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("generateValueByOnlyPriorityForUser")
-    public void findByUser_searchByPriorityOnly_returnsElementFoundInRepo(List<Todo> expectedTodoForUser, String generatePriority) {
-        //given
-        Pageable pageable = PageRequest.of(0, 1);
-        PageImpl<Todo> pageImp = new PageImpl<>(expectedTodoForUser, pageable, expectedTodoForUser.size());
-
-        when(todoService.getCurrentUser()).thenReturn(currentUserUSER);
-        when(todoJpaRepository.findAllByPriorityAndUserId
-                (eq(generatePriority), eq(currentUserUSER.getId()), eq(pageable))).thenReturn(pageImp);
-        //when
-        Page<Todo> todoPage = searchTodoService.find(new TodoSearchParamsDto(null, generatePriority), pageable);
-        //then
-        assertThat(todoPage.getContent()).hasSize(expectedTodoForUser.size());
-        assertThat(todoPage.getContent()).containsAll(expectedTodoForUser);
-        verify(todoJpaRepository, times(1)).findAllByPriorityAndUserId(anyString(), anyLong(), any());
-        verify(todoService, times(2)).getCurrentUser();
-    }
-
-    private static Stream<Arguments> generateValueByOnlyPriorityForUser() {
-        return Stream.of(
-                of(listTodosForUser, "priorytet"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("generateValueByBothElementForAdmin")
-    public void findByAdmin_searchByBothElement_returnsElementFoundInRepo(List<Todo> expectedTodoForAdmin, String generateName, String generatePriority) {
-        //given
-        Pageable pageable = PageRequest.of(0, 1);
-        PageImpl<Todo> pageImp = new PageImpl<>(expectedTodoForAdmin, pageable, expectedTodoForAdmin.size());
-
-        when(todoJpaRepository.findAllByNameAndPriority(eq(generateName), eq(generatePriority), eq(pageable))).thenReturn(pageImp);
-        when(todoService.getCurrentUser()).thenReturn(currentUserADMIN);
-        //when
-        Page<Todo> todoPage = searchTodoService.find(new TodoSearchParamsDto(generateName, generatePriority), pageable);
-        //then
-        assertThat(todoPage.getContent()).hasSize(expectedTodoForAdmin.size());
-        assertThat(todoPage.getContent()).containsAll(expectedTodoForAdmin);
-        verify(todoJpaRepository, times(1)).findAllByNameAndPriority(anyString(), anyString(), any());
-        verify(todoService, times(1)).getCurrentUser();
-    }
-
-    private static Stream<Arguments> generateValueByBothElementForAdmin() {
-        return Stream.of(
-                of(listTodos, "nazwa", "priorytet"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("generateValueByBothElementForUser")
-    public void findByUser_searchByBothElement_returnsElementFoundInRepo(List<Todo> expectedTodoForUser, String generateName, String generatePriority) {
-        //given
-        Pageable pageable = PageRequest.of(0, 1);
-        PageImpl<Todo> pageImp = new PageImpl<>(expectedTodoForUser, pageable, expectedTodoForUser.size());
-
-        when(todoService.getCurrentUser()).thenReturn(currentUserUSER);
-        when(todoJpaRepository.findAllByNameAndPriorityAndUserId(eq(generateName), eq(generatePriority), eq(currentUserUSER.getId()), eq(pageable))).thenReturn(pageImp);
-        //when
-        Page<Todo> todoPage = searchTodoService.find(new TodoSearchParamsDto(generateName, generatePriority), pageable);
-        //then
-        assertThat(todoPage.getContent()).hasSize(expectedTodoForUser.size());
-        assertThat(todoPage.getContent()).containsAll(expectedTodoForUser);
-        verify(todoJpaRepository, times(1)).findAllByNameAndPriorityAndUserId(anyString(), anyString(), anyLong(), any());
-        verify(todoService, times(2)).getCurrentUser();
-    }
-
-    private static Stream<Arguments> generateValueByBothElementForUser() {
-        return Stream.of(
-                of(listTodosForUser, "nazwa", "priorytet"));
-    }
-
-
-    @ParameterizedTest
-    @ValueSource(strings = {"  ", "\t", "\n"})
-    public void isBlankForAdmin_ShouldReturnEmpty(String input) {
-        //given
-        Pageable pageable = PageRequest.of(0, 1);
-        when(todoService.getCurrentUser()).thenReturn(currentUserADMIN);
-        when(todoJpaRepository.findAllByNameAndPriority(eq(input), eq(input), eq(pageable))).thenReturn(Page.empty());
-        //when
-        Page<Todo> todoPageADMIN = searchTodoService.find(new TodoSearchParamsDto(input, input), pageable);
-        //then
-        assertThat(todoPageADMIN.getContent()).hasSize(0);
-        assertThat(todoPageADMIN.getContent()).containsAll(Page.empty());
-        verify(todoJpaRepository, times(1)).findAllByNameAndPriority(anyString(), anyString(), any());
+                of(TODO_LIST, TODO_DTO_LIST, "nazwa", "priorytet"));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"  ", "\t", "\n"})
-    public void isBlankForUser_ShouldReturnEmpty(String input) {
-        //given
-        Pageable pageable = PageRequest.of(0, 1);
-        when(todoService.getCurrentUser()).thenReturn(currentUserUSER);
-        when(todoJpaRepository.findAllByNameAndPriorityAndUserId(eq(input), eq(input), eq(currentUserUSER.getId()), eq(pageable))).thenReturn(Page.empty());
+    public void isBlank_ShouldReturnEmpty(String input) {
+        TodoSpecificationsBuilder todoSpecificationsBuilder = new TodoSpecificationsBuilder();
+        todoSpecificationsBuilder.with("name", "=", input);
+        todoSpecificationsBuilder.with("priority", "=", input);
+        Specification<Todo> specification = todoSpecificationsBuilder.build();
+        Pageable pageable = PageRequest.of(0, 2);
+        when(todoJpaRepository.findAll(eq(specification), eq(pageable))).thenReturn(Page.empty());
         //when
-        Page<Todo> todoPageUSER = searchTodoService.find(new TodoSearchParamsDto(input, input), pageable);
+        Page<TodoDtoWithoutUser> todoPage = searchTodoService.searchByParams(specification, pageable);
         //then
-
-        assertThat(todoPageUSER.getContent()).hasSize(0);
-        assertThat(todoPageUSER.getContent()).containsAll(Page.empty());
-        verify(todoJpaRepository, times(1)).findAllByNameAndPriorityAndUserId(anyString(), anyString(), anyLong(), any());
+        assertThat(todoPage.getContent()).hasSize(0);
+        assertThat(todoPage.getContent()).containsAll(Page.empty());
+        verify(todoJpaRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
     }
+
+    private void convertAllToDto(List<Todo> expectedTodos, List<TodoDtoWithoutUser> expectedDtos) {
+        for (int i = 0; i < expectedTodos.size(); i++) {
+            when(todo2TodoWithoutUserDtoConverter.convert(expectedTodos.get(i))).thenReturn(expectedDtos.get(i));
+        }
+    }
+
 }

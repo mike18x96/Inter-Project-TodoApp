@@ -47,25 +47,25 @@ class UserServiceTest {
     private static final User USER_TEST = new User(1L, "henio", "henio", USER);
     private static final User ADMIN_TEST = new User(2L, "admin", "admin", ADMIN);
     private static final User NEW_USER_TEST = new User(1L, "henio", "password", USER);
-    private static final List<User> listUser = List.of(USER_TEST, ADMIN_TEST);
+    private static final List<User> LIST_USER = List.of(USER_TEST, ADMIN_TEST);
 
     private static final UserDto USER_DTO_TEST = new UserDto(1L, "henio", USER);
     private static final UserDto ADMIN_DTO_TEST = new UserDto(2L, "admin", ADMIN);
-    private static final List<UserDto> listUserDto = List.of(USER_DTO_TEST, ADMIN_DTO_TEST);
+    private static final List<UserDto> LIST_USER_DTO = List.of(USER_DTO_TEST, ADMIN_DTO_TEST);
 
     @Test
     void findAll_byPageRequest_returnPageOfUserDto() {
 
         //given
         Pageable pageable = PageRequest.of(0, 2);
-        PageImpl<User> pageImp = new PageImpl<>(listUser, pageable, listUser.size());
+        PageImpl<User> pageImp = new PageImpl<>(LIST_USER, pageable, LIST_USER.size());
         when(userRepository.findAll(pageable)).thenReturn(pageImp);
         lenient().when(userToUserDtoConverter.convert(USER_TEST)).thenReturn(USER_DTO_TEST);
         lenient().when(userToUserDtoConverter.convert(ADMIN_TEST)).thenReturn(ADMIN_DTO_TEST);
         //when
         Page<UserDto> userDtoPage = userService.findAll(pageable);
         //then
-        assertThat(userDtoPage.getContent()).hasSize(listUserDto.size());
+        assertThat(userDtoPage.getContent()).hasSize(LIST_USER_DTO.size());
         verify(userRepository, times(1)).findAll(pageable);
 
     }
@@ -95,7 +95,6 @@ class UserServiceTest {
         verify(userRepository, times(1)).existsById(1l);
         verify(passwordEncoder, times(1)).encode(anyString());
         verifyNoMoreInteractions(userRepository);
-
     }
 
     @Test
@@ -108,7 +107,6 @@ class UserServiceTest {
         //then
         verify(userRepository, times(1)).existsById(anyLong());
         verifyNoMoreInteractions(userRepository);
-
     }
 
     @Test

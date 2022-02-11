@@ -47,6 +47,24 @@ public class UserRestController {
             return userService.updatePasswordByUser(loginUser);
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     @PutMapping("updateRoleByAdmin/{id}/{role}")
     public String updateUserRole(@PathVariable("id") Long id, @PathVariable("role") String role) {
         return userService.updateUserRole(id, role);

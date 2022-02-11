@@ -156,26 +156,6 @@ public class UserControllerTest {
         verifyNoMoreInteractions(userService);
     }
 
-//    @Test
-//    @WithMockUser(value = "henio")
-//    public void updatePasswordByUser_badLogin_returns403() throws Exception {
-//        //given
-//        //when
-//        mockMvc.perform(put(URL + "/resetUserPasswordByUser" + "/badLogin" + "/" + USER_TEST.getPasswordHash())
-//                        .contentType(APPLICATION_JSON)).andReturn()
-//                .andDo(print())
-//                //then
-//                .andExpect(status().isForbidden());
-//                .andExpect(jsonPath("$", is(String.format("generatedPassword"))));
-//        verify(userService, times(1)).updatePasswordByUser(USER_TEST.getLogin(), USER_TEST.getPasswordHash());
-//        verifyNoMoreInteractions(userService);
-//    }
-
-//    @Test
-//    public void updatePasswordByUser_correctLoginButAdmin_returns403() throws Exception {
-//
-//    }
-
     @Test
     public void updateUserRoleByAdmin_correctId_returns200() throws Exception {
         when(userService.updateUserRole(USER_TEST.getId(), "ADMIN")).thenReturn("ADMIN");

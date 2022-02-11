@@ -1,6 +1,6 @@
 package com.inetum.training.todo.controller;
 
-import com.inetum.training.todo.controller.dto.TodoDtoWithoutUser;
+import com.inetum.training.user.domain.dto.TodoDtoWithoutUser;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.service.TodoService;
 import com.inetum.training.user.domain.User;
@@ -207,7 +207,6 @@ public class StandaloneTodoRestControllerTest {
         verify(todoService, never()).save(any());
         verify(todoService, never()).existsById(anyLong());
         verifyNoMoreInteractions(todoService);
-
     }
 
     @Test

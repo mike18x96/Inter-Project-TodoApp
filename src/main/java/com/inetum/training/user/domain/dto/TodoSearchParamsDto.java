@@ -1,4 +1,4 @@
-package com.inetum.training.todo.controller.dto;
+package com.inetum.training.user.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

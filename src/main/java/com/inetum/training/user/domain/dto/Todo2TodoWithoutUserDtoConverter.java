@@ -1,10 +1,10 @@
-package com.inetum.training.todo.controller.dto;
+package com.inetum.training.user.domain.dto;
 
 import com.inetum.training.todo.domain.Todo;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
+@Component
 public class Todo2TodoWithoutUserDtoConverter implements Converter<Todo, TodoDtoWithoutUser> {
     @Override
     public TodoDtoWithoutUser convert(Todo todo) {
