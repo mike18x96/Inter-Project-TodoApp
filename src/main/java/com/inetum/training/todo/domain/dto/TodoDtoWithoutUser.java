@@ -1,9 +1,11 @@
-package com.inetum.training.user.domain.dto;
+package com.inetum.training.todo.domain.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 
 @AllArgsConstructor
+@Data
 @Getter
 public class TodoDtoWithoutUser {
 

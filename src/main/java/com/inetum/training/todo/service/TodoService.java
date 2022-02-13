@@ -1,8 +1,8 @@
 package com.inetum.training.todo.service;
 
 import com.inetum.training.security.components.LoggedCurrentUser;
-import com.inetum.training.user.domain.dto.Todo2TodoWithoutUserDtoConverter;
-import com.inetum.training.user.domain.dto.TodoDtoWithoutUser;
+import com.inetum.training.todo.domain.dto.Todo2TodoWithoutUserDtoConverter;
+import com.inetum.training.todo.domain.dto.TodoDtoWithoutUser;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
 import com.inetum.training.user.persistance.UserRepository;
@@ -29,7 +29,7 @@ public class TodoService {
         } else {
             todoPage = todoJpaRepository.findAll(pageable);
         }
-        return  todoPage.map(todo -> todo2TodoWithoutUserDtoConverter.convert(todo));
+        return todoPage.map(todo -> todo2TodoWithoutUserDtoConverter.convert(todo));
     }
 
     public TodoDtoWithoutUser findById(Long id) {
@@ -60,7 +60,7 @@ public class TodoService {
         return todoJpaRepository.save(todo).getId();
     }
 
-    public String update(Todo todo, Long id){
+    public String update(Todo todo, Long id) {
         if (existsById(id)) {
             todo.setId(id);
             save(todo);
@@ -83,16 +83,11 @@ public class TodoService {
         if (todoJpaRepository.existsById(id)) {
             if ((loggedCurrentUser.getCurrentUser().getRole()).equals("ROLE_ADMIN")) {
                 todoJpaRepository.deleteById(id);
-            }
-            if ((loggedCurrentUser.getCurrentUser().getId() == todoJpaRepository.findById(id).get().getUser().getId())) {
-                todoJpaRepository.deleteById(id);
+            }else{
+                if ((loggedCurrentUser.getCurrentUser().getId() == todoJpaRepository.findById(id).get().getUser().getId())) {
+                    todoJpaRepository.deleteById(id);
+                }
             }
         }
     }
-
-//    CurrentUser getCurrentUser() {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        return (CurrentUser) auth.getPrincipal();
-//    }
-
 }

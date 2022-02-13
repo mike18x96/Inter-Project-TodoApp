@@ -1,7 +1,7 @@
 package com.inetum.training.todo.service;
 
-import com.inetum.training.user.domain.dto.Todo2TodoWithoutUserDtoConverter;
-import com.inetum.training.user.domain.dto.TodoDtoWithoutUser;
+import com.inetum.training.todo.domain.dto.Todo2TodoWithoutUserDtoConverter;
+import com.inetum.training.todo.domain.dto.TodoDtoWithoutUser;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.TodoJpaRepository;
 import com.inetum.training.todo.persistance.specyfication.TodoSpecifications;

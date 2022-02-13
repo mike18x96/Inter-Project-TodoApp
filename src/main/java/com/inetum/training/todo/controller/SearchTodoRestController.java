@@ -1,7 +1,7 @@
 package com.inetum.training.todo.controller;
 
 import com.inetum.training.security.components.LoggedCurrentUser;
-import com.inetum.training.user.domain.dto.TodoDtoWithoutUser;
+import com.inetum.training.todo.domain.dto.TodoDtoWithoutUser;
 import com.inetum.training.todo.domain.Todo;
 import com.inetum.training.todo.persistance.specyfication.TodoSpecificationsBuilder;
 import com.inetum.training.todo.service.SearchTodoService;

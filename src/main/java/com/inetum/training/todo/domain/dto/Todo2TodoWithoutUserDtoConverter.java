@@ -1,4 +1,4 @@
-package com.inetum.training.user.domain.dto;
+package com.inetum.training.todo.domain.dto;
 
 import com.inetum.training.todo.domain.Todo;
 import org.springframework.core.convert.converter.Converter;

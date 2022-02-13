@@ -2,7 +2,7 @@ package com.inetum.training.todo.controller;
 
 import com.inetum.training.security.components.LoggedCurrentUser;
 import com.inetum.training.security.model.CurrentUser;
-import com.inetum.training.user.domain.dto.TodoDtoWithoutUser;
+import com.inetum.training.todo.domain.dto.TodoDtoWithoutUser;
 import com.inetum.training.todo.service.SearchTodoService;
 import com.inetum.training.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
