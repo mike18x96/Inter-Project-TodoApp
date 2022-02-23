@@ -1,8 +1,9 @@
 package com.inetum.training.user.controller;
 
-import com.inetum.training.user.controller.dto.UserDto;
-import com.inetum.training.user.domain.User;
-import com.inetum.training.user.service.UserService;
+import com.inetum.training.entity.user.controller.UserController;
+import com.inetum.training.entity.user.dto.UserDto;
+import com.inetum.training.entity.user.model.User;
+import com.inetum.training.entity.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,8 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 import static com.inetum.training.TestJsonUtils.convertObjectToJson;
-import static com.inetum.training.user.domain.User.Role.ADMIN;
-import static com.inetum.training.user.domain.User.Role.USER;
+import static com.inetum.training.entity.user.model.User.Role.ADMIN;
+import static com.inetum.training.entity.user.model.User.Role.USER;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -48,7 +49,7 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setUp() {
-        mockMvc = standaloneSetup(new UserRestController(userService))
+        mockMvc = standaloneSetup(new UserController(userService))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
     }

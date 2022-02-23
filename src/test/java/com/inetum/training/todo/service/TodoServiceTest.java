@@ -1,12 +1,13 @@
 package com.inetum.training.todo.service;
 
-import com.inetum.training.security.components.LoggedCurrentUser;
-import com.inetum.training.security.model.CurrentUser;
-import com.inetum.training.todo.domain.Todo;
-import com.inetum.training.todo.domain.dto.Todo2TodoWithoutUserDtoConverter;
-import com.inetum.training.todo.domain.dto.TodoDtoWithoutUser;
-import com.inetum.training.todo.persistance.TodoJpaRepository;
-import com.inetum.training.user.domain.User;
+import com.inetum.training.entity.todo.service.TodoService;
+import com.inetum.training.security.LoggedCurrentUser;
+import com.inetum.training.security.CurrentUser;
+import com.inetum.training.entity.todo.model.Todo;
+import com.inetum.training.entity.todo.dto.Todo2TodoWithoutUserDtoConverter;
+import com.inetum.training.entity.todo.dto.TodoDtoWithoutUser;
+import com.inetum.training.entity.todo.repository.TodoJpaRepository;
+import com.inetum.training.entity.user.model.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,8 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.inetum.training.user.domain.User.Role.ADMIN;
-import static com.inetum.training.user.domain.User.Role.USER;
+import static com.inetum.training.entity.user.model.User.Role.ADMIN;
+import static com.inetum.training.entity.user.model.User.Role.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.mockito.Mockito.*;

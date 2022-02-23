@@ -1,10 +1,11 @@
 package com.inetum.training.user.service;
 
-import com.inetum.training.security.model.CurrentUser;
-import com.inetum.training.user.controller.dto.UserDto;
-import com.inetum.training.user.controller.dto.UserToUserDtoConverter;
-import com.inetum.training.user.domain.User;
-import com.inetum.training.user.persistance.UserRepository;
+import com.inetum.training.entity.user.service.UserService;
+import com.inetum.training.security.CurrentUser;
+import com.inetum.training.entity.user.dto.UserDto;
+import com.inetum.training.entity.user.dto.UserToUserDtoConverter;
+import com.inetum.training.entity.user.model.User;
+import com.inetum.training.entity.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,8 +21,8 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.inetum.training.user.domain.User.Role.ADMIN;
-import static com.inetum.training.user.domain.User.Role.USER;
+import static com.inetum.training.entity.user.model.User.Role.ADMIN;
+import static com.inetum.training.entity.user.model.User.Role.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
