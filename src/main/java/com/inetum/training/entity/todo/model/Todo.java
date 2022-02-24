@@ -30,7 +30,7 @@ public class Todo implements Serializable {
     private boolean completed;
 
     @ManyToOne
-    @JoinColumn(name = "users_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
 }
