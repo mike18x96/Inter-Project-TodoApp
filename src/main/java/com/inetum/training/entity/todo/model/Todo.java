@@ -14,7 +14,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @Builder
 @Entity
-@Table(name = "Todo")
+@Table(name = "todo")
 public class Todo implements Serializable {
 
     private static final long serialVersionUID = 376436963768417453L;
@@ -30,7 +30,7 @@ public class Todo implements Serializable {
     private boolean completed;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "users_id")
     private User user;
 
 }
