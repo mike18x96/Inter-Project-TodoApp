@@ -49,7 +49,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     .getSubject();
             if (userName != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-                return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
+                return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
             }
         }
         return null;

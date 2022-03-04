@@ -1,16 +1,13 @@
 package com.inetum.training.entity.user.service;
 
-import com.inetum.training.entity.user.repository.UserRepository;
-import com.inetum.training.security.CurrentUser;
 import com.inetum.training.entity.user.dto.UserDto;
-import com.inetum.training.entity.user.model.User;
 import com.inetum.training.entity.user.dto.UserToUserDtoConverter;
+import com.inetum.training.entity.user.model.User;
+import com.inetum.training.entity.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -31,6 +29,17 @@ public class UserService {
         Page<User> userPage = userRepository.findAll(pageRequest);
         final UserToUserDtoConverter userToUserDtoConverter = new UserToUserDtoConverter();
         return userPage.map(user -> userToUserDtoConverter.convert(user));
+    }
+
+    public Optional<UserDto> findUser(String userName) {
+
+        Optional<User> currentUser = userRepository.findByLogin(userName);
+        final UserToUserDtoConverter userToUserDtoConverter = new UserToUserDtoConverter();
+
+        return Optional.ofNullable(currentUser
+                .map(user -> userToUserDtoConverter.convert(user))
+                .orElseThrow(() -> new EntityNotFoundException("User: " + userName + " not found!")));
+
     }
 
     public Long save(User user) {
@@ -93,11 +102,5 @@ public class UserService {
     public String notFoundEntityHandler() {
         return "Not found object with this id";
     }
-
-    private CurrentUser getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return (CurrentUser) auth.getPrincipal();
-    }
-
 
 }

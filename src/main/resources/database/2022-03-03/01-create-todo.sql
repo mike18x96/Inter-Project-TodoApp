@@ -11,6 +11,3 @@ CREATE TABLE IF NOT EXISTS todo
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
--- ALTER TABLE todo
---     ADD CONSTRAINT user_id
---         FOREIGN KEY (user_id) REFERENCES user(id)
