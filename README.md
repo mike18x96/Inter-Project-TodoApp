@@ -31,3 +31,20 @@ W projekcie wykorzystywany jest GIT jako system kontroli wersji. Komendy potrzeb
 wersji aplikacji w większości podane będą wprost w zadaniach.
 
 Niektóre przydatne komendy znajdują się w pliku "Git.md", rysunek obrazujący proponowane flow w pliku "flow_gitowe.png"
+
+### Docker
+Projekt używa Dockera
+
+- Aby zbudować aplikację należy wykonać z linii poleceń komendę
+
+        docker build -f Dockerfile -t apptodo:v1 .
+
+- Następnie sprawdzić id zbudowanego obrazu
+      
+        docker images
+
+- Aby uruchomić aplikację należy użyć komendy
+
+        docker run -p 8000:8080 (id obrazu)
+
+  
