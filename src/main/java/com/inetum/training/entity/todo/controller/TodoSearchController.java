@@ -44,12 +44,4 @@ public class TodoSearchController {
         }
         return searchService.searchByParams(spec, pageable);
     }
-
-
-    //    @RequestMapping(method = RequestMethod.GET)
-//    public Page<Todo> getAll(@RequestParam(value="name", required = false) String name,
-//                             @RequestParam(value="priority", required = false) String priority,
-//                             Pageable pageable){
-//        return searchService.find(new TodoSearchParamsDto(name, priority), pageable);
-//    }
 }
